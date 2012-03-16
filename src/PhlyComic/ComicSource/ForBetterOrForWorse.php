@@ -1,8 +1,8 @@
 <?php
 
-namespace Comic\ComicSource;
+namespace PhlyComic\ComicSource;
 
-use Comic\Comic;
+use PhlyComic\Comic;
 
 class ForBetterOrForWorse extends AbstractComicSource
 {

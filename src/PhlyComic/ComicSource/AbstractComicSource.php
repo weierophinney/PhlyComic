@@ -1,8 +1,8 @@
 <?php
 
-namespace Comic\ComicSource;
+namespace PhlyComic\ComicSource;
 
-use Comic\ComicSource;
+use PhlyComic\ComicSource;
 
 /**
  * Provides shared functionality for most comic source classes

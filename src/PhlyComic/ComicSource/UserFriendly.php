@@ -1,6 +1,6 @@
 <?php
 
-namespace Comic\ComicSource;
+namespace PhlyComic\ComicSource;
 
 class UserFriendly extends AbstractDomSource
 {

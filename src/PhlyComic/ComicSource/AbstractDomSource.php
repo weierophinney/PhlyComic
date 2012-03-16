@@ -1,8 +1,8 @@
 <?php
 
-namespace Comic\ComicSource;
+namespace PhlyComic\ComicSource;
 
-use Comic\Comic,
+use PhlyComic\Comic,
     Zend\Dom\Query as DomQuery;
 
 

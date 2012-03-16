@@ -1,6 +1,6 @@
 <?php
 
-namespace Comic;
+namespace PhlyComic;
 
 /**
  * Describes the pieces of a daily comic that will be used to generate output

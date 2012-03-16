@@ -1,6 +1,6 @@
 <?php
 
-namespace Comic;
+namespace PhlyComic;
 
 /**
  * Describes a comic source

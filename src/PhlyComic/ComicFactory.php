@@ -1,6 +1,6 @@
 <?php
 
-namespace Comic;
+namespace PhlyComic;
 
 use DomainException,
     InvalidArgumentException;
@@ -11,19 +11,19 @@ abstract class ComicFactory
      * @var array List of comic source classes
      */
     protected static $comicClasses = array(
-        'Comic\ComicSource\BasicInstructions',
-        'Comic\ComicSource\CtrlAltDel',
-        'Comic\ComicSource\Dilbert',
-        'Comic\ComicSource\ForBetterOrForWorse',
-        'Comic\ComicSource\FoxTrot',
-        'Comic\ComicSource\GarfieldMinusGarfield',
-        'Comic\ComicSource\GoComics',
-        'Comic\ComicSource\NotInventedHere',
-        'Comic\ComicSource\PennyArcade',
-        'Comic\ComicSource\ReptilisRex',
-        'Comic\ComicSource\ScenesFromAMultiverse',
-        'Comic\ComicSource\UserFriendly',
-        'Comic\ComicSource\Xkcd',
+        'PhlyComic\ComicSource\BasicInstructions',
+        'PhlyComic\ComicSource\CtrlAltDel',
+        'PhlyComic\ComicSource\Dilbert',
+        'PhlyComic\ComicSource\ForBetterOrForWorse',
+        'PhlyComic\ComicSource\FoxTrot',
+        'PhlyComic\ComicSource\GarfieldMinusGarfield',
+        'PhlyComic\ComicSource\GoComics',
+        'PhlyComic\ComicSource\NotInventedHere',
+        'PhlyComic\ComicSource\PennyArcade',
+        'PhlyComic\ComicSource\ReptilisRex',
+        'PhlyComic\ComicSource\ScenesFromAMultiverse',
+        'PhlyComic\ComicSource\UserFriendly',
+        'PhlyComic\ComicSource\Xkcd',
     );
 
     /**
@@ -114,4 +114,3 @@ abstract class ComicFactory
         }
     }
 }
-

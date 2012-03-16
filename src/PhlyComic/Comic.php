@@ -1,6 +1,6 @@
 <?php
 
-namespace Comic;
+namespace PhlyComic;
 
 /**
  * Value object describing a comic

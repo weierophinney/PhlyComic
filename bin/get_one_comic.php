@@ -1,5 +1,5 @@
 <?php
-use Comic\ComicFactory,
+use PhlyComic\ComicFactory,
     Zend\Console\Getopt,
     Zend\Console\Exception as GetoptException;
 

@@ -11,8 +11,11 @@ Requirements
 ----
 
 * PHP >= 5.3.3
-* Zend Framework 2 >= 2.0.0beta1 
-  Specifically Zend\Console\Getopt, which is used for the console scripts.
+* Zend Framework 2 >= 2.0.0beta1, specifically: 
+  * Zend\Console\Getopt, which is used for the console scripts
+  * Zend\Dom\Query, used for some web scraping
+  * Zend\Module, but only if you want to integrate this into a ZF2 MVC
+    application
 
 Usage
 ----
@@ -28,6 +31,7 @@ A sample script might look like this:
 
     <?php
     require_once 'Zend_Console-2.0.0beta3.phar';
+    require_once 'Zend_Dom-2.0.0beta3.phar';
     include 'path/to/PhlyComic/autoload_register.php';
     include 'path/to/PhlyComic/bin/get_comics.php';
     

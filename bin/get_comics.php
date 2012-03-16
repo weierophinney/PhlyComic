@@ -1,5 +1,5 @@
 <?php
-use Comic\ComicFactory;
+use PhlyComic\ComicFactory;
 
 $supported = ComicFactory::getSupported();
 ksort($supported);
