@@ -2,15 +2,13 @@
 
 namespace PhlyComic;
 
-use Zend\Module\Consumer\AutoloaderProvider;
-
 /**
  * This is a simple ZF2 module.
  *
  * This library can be integrated into a ZF2 application via this Module class. 
  * However, it does not actually serve any MVC artifacts.
  */
-class Module implements AutoloaderProvider
+class Module
 {
     public function getAutoloaderConfig()
     {
