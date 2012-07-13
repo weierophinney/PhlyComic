@@ -1,7 +1,7 @@
 <?php
-use PhlyComic\ComicFactory,
-    Zend\Console\Getopt,
-    Zend\Console\Exception as GetoptException;
+use PhlyComic\ComicFactory;
+use Zend\Console\Getopt;
+use Zend\Console\Exception as GetoptException;
 
 $comics = ComicFactory::getSupported();
 ksort($comics);

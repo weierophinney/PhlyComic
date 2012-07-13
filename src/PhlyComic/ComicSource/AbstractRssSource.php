@@ -2,8 +2,8 @@
 
 namespace PhlyComic\ComicSource;
 
-use PhlyComic\Comic,
-    SimpleXMLElement;
+use PhlyComic\Comic;
+use SimpleXMLElement;
 
 abstract class AbstractRssSource extends AbstractComicSource
 {

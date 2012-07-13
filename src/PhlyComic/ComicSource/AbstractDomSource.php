@@ -2,8 +2,8 @@
 
 namespace PhlyComic\ComicSource;
 
-use PhlyComic\Comic,
-    Zend\Dom\Query as DomQuery;
+use PhlyComic\Comic;
+use Zend\Dom\Query as DomQuery;
 
 
 abstract class AbstractDomSource extends AbstractComicSource

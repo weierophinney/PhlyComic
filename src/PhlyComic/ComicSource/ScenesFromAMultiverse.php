@@ -2,10 +2,10 @@
 
 namespace PhlyComic\ComicSource;
 
-use PhlyComic\Comic,
-    DOMDocument,
-    DOMXPath,
-    SimpleXMLElement;
+use PhlyComic\Comic;
+use DOMDocument;
+use DOMXPath;
+use SimpleXMLElement;
 
 class ScenesFromAMultiverse extends AbstractComicSource
 {

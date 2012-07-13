@@ -2,8 +2,8 @@
 
 namespace PhlyComic;
 
-use DomainException,
-    InvalidArgumentException;
+use DomainException;
+use InvalidArgumentException;
 
 abstract class ComicFactory
 {
