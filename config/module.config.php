@@ -16,5 +16,25 @@ return array(
                 ),
             ),
         ),
+        'phly-comic-fetch-one' => array(
+            'type' => 'Simple',
+            'options' => array(
+                'route' => 'phlycomic fetch comic --name=',
+                'defaults' => array(
+                    'controller' => 'PhlyComic\Fetch',
+                    'action'     => 'one',
+                ),
+            ),
+        ),
+        'phly-comic-list' => array(
+            'type' => 'Simple',
+            'options' => array(
+                'route' => 'phlycomic list',
+                'defaults' => array(
+                    'controller' => 'PhlyComic\Fetch',
+                    'action'     => 'list',
+                ),
+            ),
+        ),
     ))),
 );

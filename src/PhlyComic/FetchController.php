@@ -95,6 +95,27 @@ EOT;
         $this->console->writeLine('Comics written to ' . $path);
     }
 
+    public function listAction()
+    {
+        $this->verifyConsole();
+
+        $comics = ComicFactory::getSupported();
+        ksort($comics);
+
+        $mapped = array_map(function($name) {
+            return strlen($name);
+        }, array_keys($comics));
+        $longest = array_reduce($mapped, function($count, $longest) {
+            $longest = ($count > $longest) ? $count : $longest;
+            return $longest;
+        }, 0);
+
+        $this->console->writeLine('Supported comics:', Color::GREEN);
+        foreach ($comics as $alias => $info) {
+            $this->console->writeLine(sprintf("    %${longest}s: %s", $alias, $info['name']));
+        }
+    }
+
     protected function verifyConsole()
     {
         $request = $this->getRequest();
