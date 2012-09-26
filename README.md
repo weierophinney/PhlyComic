@@ -1,5 +1,5 @@
 PhlyComic: retrieve comic sources
-====
+=================================
 
 This module/library is intended for retrieving URLs to comics found on the web
 for purposes of linking and/or viewing. The comics remain the property of
@@ -8,49 +8,41 @@ local storage, and request that if you create markup for displaying them
 that you link to the originals.
 
 Requirements
-----
+------------
 
 * PHP >= 5.3.3
 * Zend Framework 2 >= 2.0.0beta1, specifically: 
-  * Zend\Console\Getopt, which is used for the console scripts
+  * Zend\Console, which is used for the console scripts
   * Zend\Dom\Query, used for some web scraping
   * Zend\Module, but only if you want to integrate this into a ZF2 MVC
     application
 
 Usage
-----
+-----
 
-Typical usage will be to simply use the `get_comics.php` and `get_one_comic.php`
-scripts. They make the following assumptions:
+This module is ZF2 Console-aware. It defines the following console tools:
 
-* They are being called by another script that sets up one or more autoloaders,
-  including functionality to autoload the code in this library, and to autoload
-  Zend\Console\Getopt.
+- `phlycomic list`, which will list all available comics
+- `phlycomic fetch comic --name`, which allows you to fetch a single comic by name
+- `phlycomic fetch all`, which will fetch all comics at once and write to a single file
 
-A sample script might look like this:
+Comic files are written by default to `data/comics/` of your application; you
+can change this by overriding the configuration; see `config/module.config.php` for
+details.
 
-    <?php
-    require_once 'Zend_Console-2.0.0beta3.phar';
-    require_once 'Zend_Dom-2.0.0beta3.phar';
-    include 'path/to/PhlyComic/autoload_register.php';
-    include 'path/to/PhlyComic/bin/get_comics.php';
-    
-### get_one_comic.php
+Typical usage will look like this from your application:
 
-    Usage: get_one_comic.php [ options ]
-    --help|-h Get a usage message
-    --comic|-c [<string>] Comic to retrieve
-    --list|-l  List comics available
+```bash
+% php public/index.php phlycomic list
+```
 
-This will spit out HTML markup for the comic, including a link to the comic
-homepage, and a linked image for the current comic available.
+```bash
+% php public/index.php phlycomic fetch comic --name=nih
+```
 
-### get_comics.php
-
-    Usage: get_comics.php
-
-This will spit out HTML markup for all available comics, including a link to
-each comic's homepage, and a linked image for the current comic available.
+```bash
+% php public/index.php phlycomic fetch all
+```
 
 License
 ----
