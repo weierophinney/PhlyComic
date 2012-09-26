@@ -48,7 +48,7 @@ class Module implements ConsoleUsageProviderInterface
         return array(
             'phlycomic fetch all' => 'Fetch all comics and cache to a view script',
             'phlycomic list' => 'List available comics',
-            'phlycomic fetch one --name' => 'Fetch a named comic',
+            'phlycomic fetch comic --name' => 'Fetch a named comic',
         );
     }
 }

@@ -28,14 +28,75 @@ class FetchController extends AbstractActionController
         return $path;
     }
 
+    public function getComicPath($name)
+    {
+        $path  = rtrim($this->config['output_path'], '\\/');
+        $path .= DIRECTORY_SEPARATOR . sprintf($this->config['comic_file'], $name);
+        return $path;
+    }
+
     public function oneAction()
     {
         $this->verifyConsole();
 
-        $message = 'Retrieving Github activity links';
-        $length  = strlen($message);
-        $width   = $this->console->getWidth();
+        $width = $this->console->getWidth();
+        $name  = $this->params()->fromRoute('name', false);
+        if (!$name) {
+            $this->reportError($width, 0, 'No name was provided; unable to fetch comic');
+            return;
+        }
+
+        $comics = ComicFactory::getSupported();
+        ksort($comics);
+
+        if (!in_array($name, array_keys($comics))) {
+            $message = sprintf('Comic "%s" is unsupported; please use "phlycomic list" to find supported comics', $name);
+            $this->reportError($width, 0, $message);
+            return;
+        }
+
+        $message = 'Fetching comic "' . $name . '"';
         $this->console->write($message, Color::BLUE);
+        $source = ComicFactory::factory($name);
+        try {
+            $comic  = $source->fetch();
+        } catch (Exception $e) {
+            $error = 'Unable to fetch comic';
+            $this->reportError($width, strlen($message), $error, $e);
+            return;
+        }
+        if (!$comic) {
+            $this->reportError($width, strlen($message), $source->getError());
+            return;
+        }
+        $this->reportSuccess($width, strlen($message));
+
+        $message = 'Generating HTML';
+        $this->console->write($message, Color::BLUE);
+
+        $template =<<<EOT
+<div class="comic">
+    <h4><a href="%s">%s</a></h4>
+    <p><a href="%s"><img src="%s"/></a></p>
+</div>
+EOT;
+
+        $errTemplate =<<<EOT
+<div class="comic">
+    <h4><a href="%s">%s</a></h4>
+    <p class="error">%s</p>
+</div>
+EOT;
+
+        if ($comic->hasError()) {
+            $html = sprintf($errTemplate . "\n", $comic->getLink(), $comic->getName(), $comic->getError());
+        } else {
+            $html = sprintf($template . "\n", $comic->getLink(), $comic->getName(), $comic->getDaily(), $comic->getImage());
+        }
+        $path = $this->getComicPath($name);
+        file_put_contents($path, $html);
+        $this->reportSuccess($width, strlen($message));
+        $this->console->writeLine('Comic written to ' . $path);
     }
 
     public function allAction()
