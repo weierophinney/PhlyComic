@@ -1,5 +1,6 @@
 <?php
 return array (
+  'PhlyComic\\FetchController' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'FetchController.php',
   'PhlyComic\\Comic' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'Comic.php',
   'PhlyComic\\ComicDescription' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicDescription.php',
   'PhlyComic\\ComicSource\\ReptilisRex' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'ReptilisRex.php',
