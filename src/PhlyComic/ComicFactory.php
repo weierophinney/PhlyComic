@@ -21,6 +21,7 @@ abstract class ComicFactory
         'PhlyComic\ComicSource\NotInventedHere',
         'PhlyComic\ComicSource\PennyArcade',
         'PhlyComic\ComicSource\ReptilisRex',
+        'PhlyComic\ComicSource\Sheldon',
         'PhlyComic\ComicSource\ScenesFromAMultiverse',
         'PhlyComic\ComicSource\UserFriendly',
         'PhlyComic\ComicSource\Xkcd',
