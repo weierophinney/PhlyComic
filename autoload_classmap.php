@@ -8,6 +8,7 @@ return array (
   'PhlyComic\\ComicSource\\GoComics' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'GoComics.php',
   'PhlyComic\\ComicSource\\ForBetterOrForWorse' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'ForBetterOrForWorse.php',
   'PhlyComic\\ComicSource\\ScenesFromAMultiverse' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'ScenesFromAMultiverse.php',
+  'PhlyComic\\ComicSource\\Sheldon' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'Sheldon.php',
   'PhlyComic\\ComicSource\\PennyArcade' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'PennyArcade.php',
   'PhlyComic\\ComicSource\\Xkcd' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'Xkcd.php',
   'PhlyComic\\ComicSource\\AbstractComicSource' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'AbstractComicSource.php',
