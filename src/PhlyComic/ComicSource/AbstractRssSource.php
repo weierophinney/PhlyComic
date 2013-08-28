@@ -22,6 +22,20 @@ abstract class AbstractRssSource extends AbstractComicSource
      */
     protected $feedUrl;
 
+    /**
+     * The namespace of the tag that holds the image, if any
+     * 
+     * @var false|string
+     */
+    protected $tagNamespace = false;
+
+    /**
+     * What tag in the feed contains the image?
+     * 
+     * @var string
+     */
+    protected $tagWithImage = 'description';
+
     public function fetch()
     {
         // Retrieve feed to parse
@@ -33,12 +47,13 @@ abstract class AbstractRssSource extends AbstractComicSource
         // daily is <link> element
         $daily = (string) $latest->link;
 
-        // image is in <description> -- /src="([^"]+)"
-        $desc  = (string) $latest->description;
-        if (!preg_match('/src="(?P<src>[^"]+)"/', $desc, $matches)) {
+        $content  = $this->getContent($latest);
+
+        // image is in content -- /src="([^"]+)"
+        if (!preg_match('/src="(?P<src>[^"]+)"/', $content, $matches)) {
             return $this->registerError(sprintf(
                 static::$comics[$this->comicShortName] . ' feed does not include image description containing image URL: %s',
-                $desc
+                $content
             ));
         }
         $image = $matches['src'];
@@ -51,6 +66,16 @@ abstract class AbstractRssSource extends AbstractComicSource
         );
 
         return $comic;
+    }
+
+    protected function getContent(SimpleXMLElement $item)
+    {
+        if (!$this->tagNamespace) {
+            return (string) $item->{$this->tagWithImage};
+        }
+
+        $namespacedChildren = $item->children($this->tagNamespace);
+        return (string) $namespacedChildren->{$this->tagWithImage};
     }
 
     protected function registerError($message)
