@@ -71,7 +71,7 @@ abstract class AbstractRssSource extends AbstractComicSource
     protected function getContent(SimpleXMLElement $item)
     {
         if (!$this->tagNamespace) {
-            return (string) $latest->{$this->tagWithImage};
+            return (string) $item->{$this->tagWithImage};
         }
 
         $namespacedChildren = $item->children($this->tagNamespace);
