@@ -11,4 +11,5 @@ class Sheldon extends AbstractRssSource
     protected $comicBase      = 'http://www.sheldoncomics.com';
     protected $comicShortName = 'sheldon';
     protected $feedUrl        = 'http://cdn.sheldoncomics.com/rss.xml';
+    protected $tagWithImage   = 'content';
 }

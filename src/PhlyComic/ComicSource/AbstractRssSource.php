@@ -22,6 +22,13 @@ abstract class AbstractRssSource extends AbstractComicSource
      */
     protected $feedUrl;
 
+    /**
+     * What tag in the feed contains the image?
+     * 
+     * @var string
+     */
+    protected $tagWithImage = 'description';
+
     public function fetch()
     {
         // Retrieve feed to parse
@@ -34,7 +41,7 @@ abstract class AbstractRssSource extends AbstractComicSource
         $daily = (string) $latest->link;
 
         // image is in <description> -- /src="([^"]+)"
-        $desc  = (string) $latest->description;
+        $desc  = (string) $latest->{$this->tagWithImage};
         if (!preg_match('/src="(?P<src>[^"]+)"/', $desc, $matches)) {
             return $this->registerError(sprintf(
                 static::$comics[$this->comicShortName] . ' feed does not include image description containing image URL: %s',
