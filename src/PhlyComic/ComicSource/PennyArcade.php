@@ -12,5 +12,5 @@ class PennyArcade extends AbstractDomSource
     protected $comicShortName = 'pennyarcade';
     protected $dailyFormat    = 'http://penny-arcade.com/comic/%s';
     protected $dateFormat     = 'Y/m/d';
-    protected $domQuery       = 'div.post.comic img';
+    protected $domQuery       = '#comicFrame a img';
 }
