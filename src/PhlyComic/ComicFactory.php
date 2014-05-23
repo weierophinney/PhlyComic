@@ -14,6 +14,7 @@ abstract class ComicFactory
         'PhlyComic\ComicSource\BasicInstructions',
         'PhlyComic\ComicSource\CtrlAltDel',
         'PhlyComic\ComicSource\Dilbert',
+        'PhlyComic\ComicSource\Drive',
         'PhlyComic\ComicSource\ForBetterOrForWorse',
         'PhlyComic\ComicSource\FoxTrot',
         'PhlyComic\ComicSource\GarfieldMinusGarfield',
