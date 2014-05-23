@@ -20,6 +20,7 @@ return array (
   'PhlyComic\\ComicSource\\UserFriendly' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'UserFriendly.php',
   'PhlyComic\\ComicSource\\BasicInstructions' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'BasicInstructions.php',
   'PhlyComic\\ComicSource\\CtrlAltDel' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'CtrlAltDel.php',
+  'PhlyComic\\ComicSource\\Drive' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource' . DIRECTORY_SEPARATOR . 'Drive.php',
   'PhlyComic\\ComicSource' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicSource.php',
   'PhlyComic\\ComicFactory' => __DIR__ . DIRECTORY_SEPARATOR . 'src' . DIRECTORY_SEPARATOR . 'PhlyComic' . DIRECTORY_SEPARATOR . 'ComicFactory.php',
 );
