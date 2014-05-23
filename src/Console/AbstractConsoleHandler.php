@@ -111,7 +111,7 @@ EOT;
         } catch (\Exception $e) {
             $error = sprintf(
                 'Unable to fetch comic "%s"',
-                $alias
+                $name
             );
             $this->reportError($console, $width, strlen($message), $error, $e);
             return false;
