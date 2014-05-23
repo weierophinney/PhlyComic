@@ -1,0 +1,41 @@
+{
+    "name": "phly/phly-comic",
+    "description": "Library for fetching various web comic sources",
+    "type": "library",
+    "license": "BSD-2-Clause",
+    "keywords": [
+        "comics",
+        "console"
+    ],
+    "homepage": "https://github.com/weierophinney/PhlyComic",
+    "authors": [
+        {
+            "name": "Matthew Weier O'Phinney",
+            "email": "matthew@weierophinney.net",
+            "homepage": "http://mwop.net/"
+        }
+    ],
+    "support": {
+        "source": "https://github.com/weierophinney/PhlyComic",
+        "issues": "https://github.com/weierophinney/PhlyComic/issues"
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "0.0-dev",
+            "dev-develop": "1.0-dev"
+        }
+    },
+    "require": {
+        "php": ">=5.3.3",
+        "zendframework/zend-dom": "~2.0",
+        "zendframework/zend-filter": "~2.0",
+        "zendframework/zend-validator": "~2.0",
+        "zfcampus/zf-console": "~1.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "PhlyComic\\": "src/"
+        }
+    },
+    "bin": ["bin/phly-comic.php"]
+}

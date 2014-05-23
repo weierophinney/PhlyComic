@@ -1,1 +1,3 @@
 .vimproject
+composer.lock
+vendor/
