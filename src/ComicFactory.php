@@ -23,6 +23,7 @@ abstract class ComicFactory
         'PhlyComic\ComicSource\NotInventedHere',
         'PhlyComic\ComicSource\PennyArcade',
         'PhlyComic\ComicSource\ReptilisRex',
+        'PhlyComic\ComicSource\SaturdayMorningBreakfastCereal',
         'PhlyComic\ComicSource\Sheldon',
         'PhlyComic\ComicSource\ScenesFromAMultiverse',
         'PhlyComic\ComicSource\UserFriendly',
