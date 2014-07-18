@@ -4,7 +4,7 @@ namespace PhlyComic\ComicSource;
 
 use DateTime;
 
-class FoxTrot extends AbstractDomSource
+class FoxTrot extends AbstractRssSource
 {
     protected static $comics = array(
         'foxtrot' => 'FoxTrot',
@@ -12,24 +12,7 @@ class FoxTrot extends AbstractDomSource
 
     protected $comicBase      = 'http://www.foxtrot.com';
     protected $comicShortName = 'foxtrot';
-    protected $dailyFormat    = 'http://www.foxtrot.com/%s';
-    protected $dateFormat     = 'Y/m/d/';
-    protected $domQuery       = '#comic img';
-    protected $useComicBase   = true;
-
-    protected function getDailyUrl($imgUrl)
-    {
-        $date      = new DateTime('now');
-        $dayOfWeek = $date->format('l');
-        switch ($dayOfWeek) {
-            case 'Sunday':
-                break;
-            default:
-                $date = new DateTime('last Sunday');
-                break;
-        }
-
-        $url = sprintf($this->dailyFormat, $date->format($this->dateFormat));
-        return $url;
-    }
+    protected $feedUrl        = 'http://www.foxtrot.com/feed/';
+    protected $tagNamespace   = 'http://purl.org/rss/1.0/modules/content/';
+    protected $tagWithImage   = 'encoded';
 }
