@@ -46,7 +46,8 @@ abstract class AbstractRssSource extends AbstractComicSource
         $this->content = null;
 
         // Retrieve feed to parse
-        $sxl = new SimpleXMLElement($this->feedUrl, 0, true);
+        $rawFeed = $this->fetchFeed($this->feedUrl);
+        $sxl = new SimpleXMLElement($rawFeed);
 
         $data = $this->getDataFromFeed($sxl);
 
@@ -116,5 +117,18 @@ abstract class AbstractRssSource extends AbstractComicSource
         );
         $comic->setError($message);
         return $comic;
+    }
+
+    protected function fetchFeed($url)
+    {
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_URL, $url);
+        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($curl, CURLOPT_MAXREDIRS, 5);
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1');
+        $content = curl_exec($curl);
+        curl_close($curl);
+        return $content;
     }
 }
