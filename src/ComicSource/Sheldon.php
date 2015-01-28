@@ -13,4 +13,10 @@ class Sheldon extends AbstractRssSource
     protected $feedUrl        = 'http://cdn.sheldoncomics.com/rss.xml';
     protected $tagNamespace   = 'http://purl.org/rss/1.0/modules/content/';
     protected $tagWithImage   = 'encoded';
+
+    protected function isOfInterest($item)
+    {
+        $link = (string) $item->guid;
+        return preg_match('#/archive/#', $link);
+    }
 }
