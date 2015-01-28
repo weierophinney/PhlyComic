@@ -12,6 +12,7 @@ abstract class ComicFactory
      */
     protected static $comicClasses = array(
         'PhlyComic\ComicSource\BasicInstructions',
+        'PhlyComic\ComicSource\CommitStrip',
         'PhlyComic\ComicSource\CtrlAltDel',
         'PhlyComic\ComicSource\Dilbert',
         'PhlyComic\ComicSource\DorkTower',
@@ -37,7 +38,7 @@ abstract class ComicFactory
 
     /**
      * Retrieve a source class for a given comic
-     * 
+     *
      * @param  string $name Comic "alias" used within a comic source
      * @return ComicSource
      */
@@ -70,8 +71,8 @@ abstract class ComicFactory
      * Add a comic source class to use with the factory
      *
      * Must implement ComicSource.
-     * 
-     * @param  string $classname 
+     *
+     * @param  string $classname
      * @return void
      */
     public static function addSourceClass($classname)
@@ -83,11 +84,11 @@ abstract class ComicFactory
     /**
      * Get list of supported comics
      *
-     * Returns a list of supported comics. Each key is a comic "alias" used by 
-     * the comic source, pointing to an array with "name" and "class" keys; the 
+     * Returns a list of supported comics. Each key is a comic "alias" used by
+     * the comic source, pointing to an array with "name" and "class" keys; the
      * "name" is the comic name, and the "class" is the comic source class used
      * to retrieve it.
-     * 
+     *
      * @return array
      */
     public static function getSupported()
@@ -98,7 +99,7 @@ abstract class ComicFactory
 
     /**
      * Initialize the {@link $supported} list
-     * 
+     *
      * @return void
      */
     protected static function initSupported()
