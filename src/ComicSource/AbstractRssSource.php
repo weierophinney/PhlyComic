@@ -51,6 +51,10 @@ abstract class AbstractRssSource extends AbstractComicSource
 
         $data = $this->getDataFromFeed($sxl);
 
+        if ($data instanceof Comic) {
+            return $data;
+        }
+
         if (!$data) {
             return $this->registerError(sprintf(
                 static::$comics[$this->comicShortName]
@@ -90,6 +94,11 @@ abstract class AbstractRssSource extends AbstractComicSource
             $daily   = (string) $latest->link;
             $content = $this->getContent($latest);
             $image   = $this->getImageFromContent($content);
+
+            if ($image instanceof Comic) {
+                return $image;
+            }
+
             if ($image) {
                 return array(
                     'daily' => $daily,
