@@ -2,6 +2,7 @@
 
 namespace PhlyComic\ComicSource;
 
+use PhlyComic\Comic;
 use SimpleXMLElement;
 use Zend\Dom\Query as DomQuery;
 
@@ -21,7 +22,7 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
 
     protected $comicBase      = 'http:/www.smbc-comics.com/';
     protected $comicShortName = 'smbc';
-    protected $domQuery       = '#comicimage img';
+    protected $domQuery       = 'img#comic';
     protected $feedUrl        = 'http://www.smbc-comics.com/rss.php';
 
     protected function getDataFromFeed(SimpleXMLElement $feed)
@@ -29,6 +30,10 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
         foreach ($feed->channel->item as $latest) {
             $link  = (string) $latest->link;
             $image = $this->getImageFromLink($link);
+
+            if ($image instanceof Comic) {
+                return $image;
+            }
 
             if ($image) {
                 return array(
@@ -76,6 +81,6 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
             ));
         }
 
-        return $imgUrl;
+        return $this->comicBase . $imgUrl;
     }
 }
