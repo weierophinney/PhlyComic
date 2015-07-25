@@ -14,4 +14,5 @@ class NotInventedHere extends AbstractDomSource
     protected $dateFormat     = 'Y-n-j';
     protected $domQuery       = '#comic-content img';
     protected $domIsHtml      = true;
+    protected $useComicBase   = true;
 }
