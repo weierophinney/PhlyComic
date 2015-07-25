@@ -29,14 +29,14 @@ abstract class AbstractRssSource extends AbstractComicSource
 
     /**
      * The namespace of the tag that holds the image, if any
-     * 
+     *
      * @var false|string
      */
     protected $tagNamespace = false;
 
     /**
      * What tag in the feed contains the image?
-     * 
+     *
      * @var string
      */
     protected $tagWithImage = 'description';
@@ -51,9 +51,14 @@ abstract class AbstractRssSource extends AbstractComicSource
 
         $data = $this->getDataFromFeed($sxl);
 
+        if ($data instanceof Comic) {
+            return $data;
+        }
+
         if (!$data) {
             return $this->registerError(sprintf(
-                static::$comics[$this->comicShortName] . ' feed does not include image description containing image URL: %s',
+                static::$comics[$this->comicShortName]
+                . ' feed does not include image description containing image URL: %s',
                 $this->content
             ));
         }
@@ -81,10 +86,19 @@ abstract class AbstractRssSource extends AbstractComicSource
     protected function getDataFromFeed(SimpleXMLElement $feed)
     {
         foreach ($feed->channel->item as $latest) {
+            if (! $this->isOfInterest($latest)) {
+                continue;
+            }
+
             // daily is <link> element
             $daily   = (string) $latest->link;
             $content = $this->getContent($latest);
             $image   = $this->getImageFromContent($content);
+
+            if ($image instanceof Comic) {
+                return $image;
+            }
+
             if ($image) {
                 return array(
                     'daily' => $daily,
@@ -126,9 +140,18 @@ abstract class AbstractRssSource extends AbstractComicSource
         curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($curl, CURLOPT_MAXREDIRS, 5);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1');
+        curl_setopt(
+            $curl,
+            CURLOPT_USERAGENT,
+            'Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1'
+        );
         $content = curl_exec($curl);
         curl_close($curl);
         return $content;
+    }
+
+    protected function isOfInterest($item)
+    {
+        return true;
     }
 }
