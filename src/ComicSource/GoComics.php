@@ -7,13 +7,14 @@ use InvalidArgumentException;
 class GoComics extends AbstractDomSource
 {
     protected static $comics = array(
-        'pickles'         => 'Pickles',
+        'bloom-county'    => 'Bloom County 2015',
         'calvinandhobbes' => 'Calvin and Hobbes',
-        'fminus'          => 'F Minus',
         'closetohome'     => 'Close to Home',
         'culdesac'        => 'Cul de Sac',
+        'fminus'          => 'F Minus',
         'nonsequitur'     => 'Non Sequitur',
         'peanuts'         => 'Peanuts',
+        'pickles'         => 'Pickles',
     );
 
     protected $comicFormat = 'http://www.gocomics.com/%s';
