@@ -2,6 +2,7 @@
 
 namespace PhlyComic\ComicSource;
 
+use PhlyComic\Comic;
 use SimpleXMLElement;
 use Zend\Dom\Query as DomQuery;
 
@@ -37,6 +38,12 @@ class PennyArcade extends AbstractRssSource
             // daily is <link> element
             $link    = (string) $latest->link;
             $image   = $this->getImageFromLink($link);
+
+            // If we have a Comic, it's because of an
+            // error; return it directly.
+            if ($image instanceof Comic) {
+                return $image;
+            }
 
             if ($image) {
                 return array(
