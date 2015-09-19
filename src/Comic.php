@@ -2,10 +2,12 @@
 
 namespace PhlyComic;
 
+use JsonSerializable;
+
 /**
  * Value object describing a comic
  */
-class Comic implements ComicDescription
+class Comic implements ComicDescription, JsonSerializable
 {
     protected $name;
     protected $link;
@@ -19,6 +21,20 @@ class Comic implements ComicDescription
         $this->link  = $link;
         $this->daily = $daily;
         $this->image = $image;
+    }
+
+    /**
+     * Implemented to allow debugging via json_encode
+     */
+    public function jsonSerialize()
+    {
+        return [
+            'name'  => $this->name,
+            'link'  => $this->link,
+            'daily' => $this->daily,
+            'image' => $this->image,
+            'error' => $this->error,
+        ];
     }
 
     public function getName()
