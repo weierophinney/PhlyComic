@@ -12,6 +12,7 @@ class GoComics extends AbstractDomSource
         'closetohome'     => 'Close to Home',
         'culdesac'        => 'Cul de Sac',
         'fminus'          => 'F Minus',
+        'goats'           => 'Goats',
         'nonsequitur'     => 'Non Sequitur',
         'peanuts'         => 'Peanuts',
         'pickles'         => 'Pickles',
