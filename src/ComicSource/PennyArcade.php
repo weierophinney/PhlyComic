@@ -24,7 +24,7 @@ class PennyArcade extends AbstractRssSource
 
     protected $comicBase      = 'http://penny-arcade.com/comic';
     protected $comicShortName = 'pennyarcade';
-    protected $domQuery       = '#comicFrame a img';
+    protected $domQuery       = '#comicFrame img';
     protected $feedUrl        = 'http://penny-arcade.com/feed';
 
     protected function getDataFromFeed(SimpleXMLElement $feed)
