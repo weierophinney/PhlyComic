@@ -20,7 +20,7 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
         'smbc' => 'Saturday Morning Breakfast Cereal',
     );
 
-    protected $comicBase      = 'http:/www.smbc-comics.com/';
+    protected $comicBase      = 'http://www.smbc-comics.com/';
     protected $comicShortName = 'smbc';
     protected $domQuery       = 'img#comic';
     protected $feedUrl        = 'http://www.smbc-comics.com/rss.php';
