@@ -117,7 +117,7 @@ abstract class AbstractRssSource extends AbstractComicSource
     protected function getImageFromContent($content)
     {
         // image is in content -- /src="([^"]+)"
-        if (preg_match('/src="(?P<src>[^"]+)"/', $content, $matches)) {
+        if (preg_match('/\<img [^>]*src="(?P<src>[^"]+)"/', $content, $matches)) {
             return $matches['src'];
         }
         return false;
