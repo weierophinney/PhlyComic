@@ -81,6 +81,6 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
             ));
         }
 
-        return $this->comicBase . $imgUrl;
+        return $imgUrl;
     }
 }
