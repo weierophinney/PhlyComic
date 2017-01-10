@@ -20,7 +20,7 @@ class GoComics extends AbstractDomSource
 
     protected $comicFormat = 'http://www.gocomics.com/%s';
     protected $dateFormat  = 'Y/m/d';
-    protected $domQuery    = 'img.strip';
+    protected $domQuery    = 'picture.item-comic-image img';
 
     public function __construct($name)
     {
