@@ -5,7 +5,6 @@ namespace PhlyComic\ComicSource;
 use PhlyComic\Comic;
 use Zend\Dom\Query as DomQuery;
 
-
 abstract class AbstractDomSource extends AbstractComicSource
 {
     /**
@@ -91,7 +90,7 @@ abstract class AbstractDomSource extends AbstractComicSource
             ));
         }
 
-        if (!($dailyUrl = $this->getDailyUrl($imgUrl))) {
+        if (!($dailyUrl = $this->getDailyUrl($imgUrl, $dom))) {
             $dailyUrl = $url;
         }
 
@@ -115,7 +114,7 @@ abstract class AbstractDomSource extends AbstractComicSource
         return $src;
     }
 
-    protected function getDailyUrl($imgUrl)
+    protected function getDailyUrl($imgUrl, DomQuery $dom)
     {
         return false;
     }
