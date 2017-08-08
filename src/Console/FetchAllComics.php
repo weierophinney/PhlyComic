@@ -16,20 +16,26 @@ class FetchAllComics extends AbstractConsoleHandler
 {
     /**
      * Fetch all comics and write to a file
-     * 
-     * @param Route $route 
-     * @param Console $console 
+     *
+     * @param Route $route
+     * @param Console $console
      * @return int
      */
     public function __invoke(Route $route, Console $console)
     {
         $supported = ComicFactory::getSupported();
         ksort($supported);
+        $supported = array_keys($supported);
+
+        $exclude = $route->getMatchedParam('exclude', []);
+        $toFetch = array_filter($supported, function ($comic) use ($exclude) {
+            return ! in_array($comic, $exclude);
+        });
 
         $width = $console->getWidth();
         $html  = '';
 
-        foreach (array_keys($supported) as $alias) {
+        foreach ($toFetch as $alias) {
             $comic = $this->fetchComic($alias, $console, $width);
             if (! $comic instanceof Comic) {
                 continue;

@@ -7,6 +7,7 @@
 use PhlyComic\ComicFactory;
 use Zend\Filter\Callback as CallbackFilter;
 use Zend\Validator\Callback as CallbackValidator;
+use ZF\Console\Filter\Explode as ExplodeFilter;
 
 $outputValidator = new CallbackValidator(array(
     'callback' => function ($value) {
@@ -46,11 +47,15 @@ return array(
     ),
     array(
         'name' => 'fetch-all',
-        'route' => 'fetch-all [--output=]',
-        'description' => 'Fetches the named <comic> and writes an HTML file to the provided path; defaults to data/<comic>.html',
+        'route' => 'fetch-all [--output=] [--exclude=]',
+        'description' => 'Fetches all comics and writes an HTML file to the provided path; '
+            . 'defaults to data/comics/comics.html. You may provide a comma-separated list of '
+            . 'comics to exclude from the output as well; do not include any spaces before or '
+            . 'after commas used to separate entries.',
         'short_description' => 'Fetch all comics',
         'options_descriptions' => array(
             '--output' => 'Path to which the HTML for the list of comic should be written',
+            '--exclude' => 'Comma-separated list of comics to exclude',
         ),
         'defaults' => array(
             'output' => 'data/comics/comics.html',
@@ -62,9 +67,27 @@ return array(
                 }
                 return $value;
             }),
+            'exclude' => new ExplodeFilter(','),
         ),
         'validators' => array(
             'output' => $outputValidator,
+            'exclude' => new CallbackValidator(array(
+                'callback' => function ($comics) use ($comicValidator) {
+                    if (! is_array($comics)) {
+                        printf(
+                            "An invalid value was provided to --exclude; please provide a comma-separated list%s",
+                            str_repeat(PHP_EOL, 2)
+                        );
+                        return false;
+                    }
+                    $isValid = true;
+                    foreach ($comics as $comic) {
+                        $isValid = $isValid && $comicValidator->isValid($comic);
+                    }
+                    return $isValid;
+                },
+                'message' => 'One or more comics in the --exclude list is not supported.',
+            )),
         ),
     ),
     array(
