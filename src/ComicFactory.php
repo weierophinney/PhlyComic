@@ -21,6 +21,7 @@ abstract class ComicFactory
         'PhlyComic\ComicSource\FoxTrot',
         'PhlyComic\ComicSource\GarfieldMinusGarfield',
         'PhlyComic\ComicSource\GoComics',
+        'PhlyComic\ComicSource\LakeGary',
         'PhlyComic\ComicSource\ListenToMe',
         'PhlyComic\ComicSource\NotInventedHere',
         'PhlyComic\ComicSource\PennyArcade',
