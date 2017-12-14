@@ -14,7 +14,7 @@ class ForBetterOrForWorse extends AbstractComicSource
 
     protected $dailyFormat = 'http://fborfw.com/strip_fix/%s/%s/%s/';
     protected $imageFormat = 'http://fborfw.com/strip_fix/strips/fb%s.gif';
-    protected $sundayImageFormat = 'http://fborfw.com/strip_fix/strips/%s.jpg';
+    protected $sundayImageFormat = 'http://fborfw.com/strip_fix/strips/fb%s.jpg';
 
     public function fetch()
     {
