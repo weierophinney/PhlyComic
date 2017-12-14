@@ -8,10 +8,10 @@ use Zend\Dom\Query as DomQuery;
 
 /**
  * The SMBC feed provides a link to the **page** containing the comic,
- * but not a link to the comic image itself.
+ * but the link to the comic image is buried inside the description.
  *
  * This class fetches the feed, loops through entries for the first comic,
- * pulls the page in that entry's link element, and then scrapes the page for
+ * pulls the entry's description element, and scrapes the HTML it contains for
  * the comic image URL.
  */
 class SaturdayMorningBreakfastCereal extends AbstractRssSource
@@ -22,18 +22,15 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
 
     protected $comicBase      = 'http://www.smbc-comics.com/';
     protected $comicShortName = 'smbc';
-    protected $domQuery       = 'img#cc-comic';
+    protected $domQuery       = 'img';
     protected $feedUrl        = 'http://www.smbc-comics.com/rss.php';
 
     protected function getDataFromFeed(SimpleXMLElement $feed)
     {
         foreach ($feed->channel->item as $latest) {
-            $link  = (string) $latest->link;
-            $image = $this->getImageFromLink($link);
-
-            if ($image instanceof Comic) {
-                return $image;
-            }
+            $description = (string) $latest->description;
+            $link        = (string) $latest->link;
+            $image       = $this->getImageFromDescription($description, $link);
 
             if ($image) {
                 return array(
@@ -45,21 +42,13 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
         return false;
     }
 
-    protected function getImageFromLink($url)
+    protected function getImageFromDescription($description, $url)
     {
-        $page = file_get_contents($url);
-        if (!$page) {
-            return $this->registerError(sprintf(
-                'Comic at "%s" is unreachable',
-                $url
-            ));
-        }
-
-        $dom  = new DomQuery();
-        $dom->setDocumentHtml($page);
-
+        $dom = new DomQuery();
+        $dom->setDocumentHtml($description);
         $r = $dom->execute($this->domQuery);
-        if (!$r->count()) {
+
+        if (! $r->count()) {
             return $this->registerError(sprintf(
                 'Comic at "%s" is unreachable',
                 $url
@@ -74,7 +63,7 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
             }
         }
 
-        if (!$imgUrl) {
+        if (! $imgUrl) {
             return $this->registerError(sprintf(
                 'Unable to find image source in "%s"',
                 $url
