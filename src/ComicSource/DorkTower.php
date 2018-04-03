@@ -26,7 +26,7 @@ class DorkTower extends AbstractRssSource
     protected function getImageFromContent($content)
     {
         $image = parent::getImageFromContent($content);
-        if (! preg_match('#/\d{4}/\d{2}/DorkTower\d+\.(?:jpg|jpeg|png|gif)$#', $image)) {
+        if (! preg_match('#/\d{4}/\d{2}/dorkTower\d+\.(?:jpg|jpeg|png|gif)$#i', $image)) {
             return false;
         }
         return $image;
