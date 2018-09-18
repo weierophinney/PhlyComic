@@ -84,21 +84,4 @@ return array(
             )),
         ),
     ),
-    array(
-        'name' => 'fetch',
-        'route' => 'fetch <comic> [--output=]',
-        'description' => 'Fetches the named <comic> and writes an HTML file to the provided path; defaults to data/comics/<comic>.html',
-        'short_description' => 'Fetch a single comic',
-        'options_descriptions' => array(
-            '<comic>' => 'Name (alias) of the comic to fetch',
-            '--output' => 'Path to which the HTML for the comic should be written',
-        ),
-        'constraints' => array(
-            'comic' => '/^[a-z0-9_-]+$/i',
-        ),
-        'validators' => array(
-            'comic'  => $comicValidator,
-            'output' => $outputValidator,
-        ),
-    ),
 );

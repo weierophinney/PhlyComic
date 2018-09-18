@@ -30,5 +30,6 @@ define('VERSION', '1.2.0-dev');
 
 $application = new Application('PhlyComic', VERSION);
 $application->add(new ListComics());
+$application->add(new FetchComic());
 
 $application->run();

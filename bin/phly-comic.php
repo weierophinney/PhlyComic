@@ -29,7 +29,6 @@ switch (true) {
 define('VERSION', '1.0.0-dev');
 
 $dispatcher  = new Dispatcher();
-$dispatcher->map('fetch', 'PhlyComic\Console\FetchComic');
 $dispatcher->map('fetch-all', 'PhlyComic\Console\FetchAllComics');
 
 $application = new Application(
