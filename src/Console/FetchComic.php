@@ -6,24 +6,70 @@
 
 namespace PhlyComic\Console;
 
-use Zend\Console\Adapter\AdapterInterface as Console;
-use Zend\Console\ColorInterface as Color;
-use ZF\Console\Route;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-class FetchComic extends AbstractConsoleHandler
+class FetchComic extends Command
 {
-    public function __invoke(Route $route, Console $console)
-    {
-        $width = $console->getWidth();
-        $name  = $route->getMatchedParam('comic');
+    use ComicConsoleTrait;
 
-        $comic = $this->fetchComic($name, $console, $width);
-        if (! $comic) {
-            return 1;
+    protected function configure()
+    {
+        $this->setName('fetch');
+        $this->setDescription('Fetch a single comic');
+        $this->setHelp(
+            'Fetches the named <comic> and writes an HTML file to the provided path.'
+        );
+
+        $this->addArgument(
+            'comic',
+            InputArgument::REQUIRED,
+            'Name (alias) of the comic to fetch'
+        );
+
+        $this->addOption(
+            'output',
+            'o',
+            InputOption::VALUE_REQUIRED,
+            'Path to which the HTML for the comic should be written'
+        );
+    }
+
+    protected function initialize(InputInterface $input, OutputInterface $output) : void
+    {
+        $this->status = 0;
+        $io = new SymfonyStyle($input, $output);
+
+        if (! $this->validateComicAlias($io, $input->getArgument('comic'))) {
+            $this->status = 1;
         }
 
-        $message = 'Generating HTML';
-        $console->write($message, Color::BLUE);
+        $outputPath = $input->getOption('output');
+        if ($outputPath && ! $this->validateOutputValue($io, $outputPath)) {
+            $this->status = 1;
+        }
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output) : int
+    {
+        $io = new SymfonyStyle($input, $output);
+        if ($this->status > 0) {
+            $io->error('One or more arguments or options are invalid.');
+            return $this->status;
+        }
+
+        $name  = $input->getArgument('comic');
+        $comic = $this->fetchComic($name, $io);
+        if (! $comic) {
+            return $this->status;
+        }
+
+        $io->text('<info>Generating HTML</>');
+        $io->progressStart();
 
         if ($comic->hasError()) {
             $html = sprintf($this->errorTemplate . "\n", $comic->getLink(), $comic->getName(), $comic->getError());
@@ -31,31 +77,12 @@ class FetchComic extends AbstractConsoleHandler
             $html = sprintf($this->comicTemplate . "\n", $comic->getLink(), $comic->getName(), $comic->getDaily(), $comic->getImage());
         }
 
-        $path = $this->getComicPath($name, $route);
+        $path = $input->getOption('output') ?: sprintf('data/comics/%s.html', $name);
         file_put_contents($path, $html);
-        $this->reportSuccess($console, $width, strlen($message));
-        $console->writeLine(sprintf(
-            '%s %s',
-            $console->colorize('Comic written to ', Color::GREEN),
-            $path
-        ));
+        $io->progressFinish();
+
+        $io->success(sprintf('Comic written to %s', $path));
 
         return 0;
-    }
-
-    /**
-     * Get path to which to write comic HTML
-     * 
-     * @param string $name 
-     * @param Route $route 
-     * @return string
-     */
-    protected function getComicPath($name, Route $route)
-    {
-        $path = $route->getMatchedParam('output', false);
-        if (! $path) {
-            $path = sprintf('data/comics/%s.html', $name);
-        }
-        return $path;
     }
 }
