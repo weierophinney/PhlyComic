@@ -31,7 +31,8 @@
         "zendframework/zend-dom": "~2.0",
         "zendframework/zend-filter": "~2.0",
         "zendframework/zend-validator": "~2.0",
-        "zfcampus/zf-console": "~1.0"
+        "zfcampus/zf-console": "~1.0",
+        "symfony/console": "^4.1"
     },
     "autoload": {
         "psr-4": {
