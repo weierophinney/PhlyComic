@@ -21,17 +21,14 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0-dev",
-            "dev-develop": "1.1-dev"
+            "dev-master": "2.0-dev",
+            "dev-develop": "2.1-dev"
         }
     },
     "require": {
-        "php": ">=5.3.3",
+        "php": "^7.1",
         "ext-curl": "*",
         "zendframework/zend-dom": "~2.0",
-        "zendframework/zend-filter": "~2.0",
-        "zendframework/zend-validator": "~2.0",
-        "zfcampus/zf-console": "~1.0",
         "symfony/console": "^4.1"
     },
     "autoload": {
