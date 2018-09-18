@@ -5,9 +5,9 @@
  * @copyright Copyright (c) Matthew Weier O'Phinney
  */
 
-use Zend\Console\Console;
-use ZF\Console\Application;
-use ZF\Console\Dispatcher;
+namespace PhlyComic\Console;
+
+use Symfony\Component\Console\Application;
 
 switch (true) {
     case (file_exists(__DIR__ . '/../vendor/autoload.php')):
@@ -26,18 +26,9 @@ switch (true) {
         throw new RuntimeException('Unable to locate Composer autoloader; please run "composer install".');
 }
 
-define('VERSION', '1.0.0-dev');
+define('VERSION', '1.2.0-dev');
 
-$dispatcher  = new Dispatcher();
-$dispatcher->map('fetch', 'PhlyComic\Console\FetchComic');
-$dispatcher->map('fetch-all', 'PhlyComic\Console\FetchAllComics');
+$application = new Application('PhlyComic', VERSION);
+$application->add(new ListComics());
 
-$application = new Application(
-    'PhlyComic',
-    VERSION,
-    include __DIR__ . '/../config/routes.php',
-    Console::getInstance(),
-    $dispatcher
-);
-$exit = $application->run();
-exit($exit);
+$application->run();

@@ -7,33 +7,42 @@
 namespace PhlyComic\Console;
 
 use PhlyComic\ComicFactory;
-use Zend\Console\Adapter\AdapterInterface as Console;
-use Zend\Console\ColorInterface as Color;
-use ZF\Console\Route;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 
-class ListComics
+class ListComics extends Command
 {
-    public function __invoke(Route $route, Console $console)
+    protected function configure()
     {
+        $this->setName('list-comics');
+        $this->setDescription('List all available comics');
+        $this->setHelp(
+            'Lists all comics that PhlyComic is capable of fetching,'
+            . ' providing both the short name (used to fetch individual comics)'
+            . ' and the full name.'
+        );
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output) : int
+    {
+        $io = new SymfonyStyle($input, $output);
+        $io->title('Supported comics');
+
         $comics = ComicFactory::getSupported();
         ksort($comics);
 
-        $mapped = array_map(function ($name) {
-            return strlen($name);
-        }, array_keys($comics));
-        $longest = array_reduce($mapped, function ($count, $longest) {
-            $longest = ($count > $longest) ? $count : $longest;
-            return $longest;
-        }, 0);
-
-        $console->writeLine('Supported comics:', Color::GREEN);
+        $table = [];
         foreach ($comics as $alias => $info) {
-            $console->writeLine(sprintf(
-                "    %s: %s%s",
-                $console->colorize($alias, Color::BLUE),
-                str_repeat(' ', $longest - strlen($alias)),
-                $info['name']
-            ));
+            $table[] = [$alias, $info['name']];
         }
+
+        $io->table(
+            ['Alias', 'Comic'],
+            $table
+        );
+
+        return 0;
     }
 }

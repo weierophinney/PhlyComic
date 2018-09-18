@@ -40,12 +40,6 @@ $comicValidator = new CallbackValidator(array(
 
 return array(
     array(
-        'name' => 'list',
-        'route' => 'list',
-        'description' => 'Lists all comics that PhlyComic is capable of fetching, providing both the short name (used to fetch individual comics) and the full name.',
-        'short_description' => 'List all available comics',
-    ),
-    array(
         'name' => 'fetch-all',
         'route' => 'fetch-all [--output=] [--exclude=]',
         'description' => 'Fetches all comics and writes an HTML file to the provided path; '
