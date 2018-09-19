@@ -44,28 +44,22 @@ abstract class AbstractDomSource extends AbstractComicSource
 
     public function fetch()
     {
-        if ($this->useComicBase) {
-            $url  = $this->comicBase;
-        } else {
-            $url  = sprintf($this->dailyFormat, date($this->dateFormat));
-        }
+        $url  = $this->getUrl();
         $page = file_get_contents($url);
-        if (!$page) {
+        if (! $page) {
             return $this->registerError(sprintf(
                 'Comic at "%s" is unreachable',
                 $url
             ));
         }
 
-        $dom  = new DomQuery();
-        if ($this->domIsHtml) {
-            $dom->setDocumentHtml($page);
-        } else {
-            $dom->setDocument($page);
-        }
+        $dom = new DomQuery();
+        $this->domIsHtml
+            ? $dom->setDocumentHtml($page)
+            : $dom->setDocument($page);
 
         $r = $dom->execute($this->domQuery);
-        if (!$r->count()) {
+        if (! $r->count()) {
             return $this->registerError(sprintf(
                 'Comic at "%s" is unreachable',
                 $url
@@ -74,23 +68,26 @@ abstract class AbstractDomSource extends AbstractComicSource
 
         $imgUrl = false;
         foreach ($r as $node) {
-            if ($node->hasAttribute('src')) {
-                $src = $node->getAttribute('src');
-                if ($this->validateImageSrc($src)) {
-                    $imgUrl = $this->formatImageSrc($src);
-                    break;
-                }
+            if (! $node->hasAttribute('src')) {
+                continue;
+            }
+
+            $src = $node->getAttribute('src');
+
+            if ($this->validateImageSrc($src)) {
+                $imgUrl = $this->formatImageSrc($src);
+                break;
             }
         }
 
-        if (!$imgUrl) {
+        if (! $imgUrl) {
             return $this->registerError(sprintf(
                 'Unable to find image source in "%s"',
                 $url
             ));
         }
 
-        if (!($dailyUrl = $this->getDailyUrl($imgUrl, $dom))) {
+        if (! ($dailyUrl = $this->getDailyUrl($imgUrl, $dom))) {
             $dailyUrl = $url;
         }
 
@@ -102,6 +99,13 @@ abstract class AbstractDomSource extends AbstractComicSource
         );
 
         return $comic;
+    }
+
+    protected function getUrl() : string
+    {
+        return $this->useComicBase
+            ? $this->comicBase
+            : sprintf($this->dailyFormat, date($this->dateFormat));
     }
 
     protected function validateImageSrc($src)
