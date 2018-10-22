@@ -2,9 +2,8 @@
 
 namespace PhlyComic\ComicSource;
 
-use DateInterval;
-use DateTimeImmutable;
 use InvalidArgumentException;
+use PhlyComic\Comic;
 
 class GoComics extends AbstractDomSource
 {
@@ -20,11 +19,11 @@ class GoComics extends AbstractDomSource
         'pickles'         => 'Pickles',
     );
 
-    protected $comicFormat = 'http://www.gocomics.com/%s';
+    protected $comicFormat = 'https://www.gocomics.com/%s';
     protected $dateFormat  = 'Y/m/d';
     protected $domQuery    = 'picture.item-comic-image img';
 
-    private $currentUrl;
+    private $baseUrl     = 'https://www.gocomics.com';
 
     public function __construct($name)
     {
@@ -41,40 +40,83 @@ class GoComics extends AbstractDomSource
 
     public function fetch()
     {
-        // Iterate over the past week of comics, attempting to find
-        // a valid URL.
-        foreach ($this->iterateDailyUrls() as $url) {
-            $this->currentUrl = $url;
+        $href = $this->fetchMostRecentComicPageHrefFromLandingPage();
+        if (! $href) {
+            return $this->registerError(sprintf(
+                'Unable to find most recent comic for "%s"',
+                $this->comicShortName
+            ));
+        }
 
-            $comic = parent::fetch();
+        $html = file_get_contents($href);
+        $xpath = $this->getXPathForDocument($html);
+        $found = false;
 
-            if ($comic && ! $comic->hasError()) {
-                return $comic;
+        foreach ($xpath->document->getElementsByTagName('picture') as $node) {
+            if ($node->hasAttribute('class')
+                && false !== strpos($node->getAttribute('class'), 'item-comic-image')
+            ) {
+                $found = $node;
+                break;
             }
         }
 
-        return $comic ?? $this->registerError(sprintf(
-            'Unable to find image source in last 7 days for "%s" at %s',
-            $this->comicShortName,
-            $this->comicBase
-        ));
+        if (! $found) {
+            return $this->registerError(sprintf(
+                'Unable to find most recent comic for "%s"; page has unexpected structure.',
+                $this->comicShortName
+            ));
+        }
+
+        $image = false;
+        foreach ($found->childNodes as $node) {
+            if ($node->nodeName === 'img') {
+                $image = $node->getAttribute('src');
+                break;
+            }
+        }
+
+        if (! $image) {
+            return $this->registerError(sprintf(
+                'Unable to find most recent comic for "%s"; img tag missing.',
+                $this->comicShortName
+            ));
+        }
+
+        return new Comic(
+            /* 'name'  => */ static::$comics[$this->comicShortName],
+            /* 'link'  => */ $this->comicBase,
+            /* 'daily' => */ $href,
+            /* 'image' => */ $image
+        );
     }
 
-    protected function getUrl() : string
+    private function fetchMostRecentComicPageHrefFromLandingPage() : ?string
     {
-        return $this->currentUrl;
+        $page = file_get_contents($this->comicBase);
+        if (! $page) {
+            return $this->registerError(sprintf(
+                'Comic at "%s" is unreachable',
+                $this->comicBase
+            ));
+        }
+
+        $comic = null;
+        $xpath = $this->getXPathForDocument($page);
+        foreach ($xpath->document->getElementsByTagName('a') as $link) {
+            if (! $link->hasAttribute('data-link')) {
+                continue;
+            }
+            if ('comics' !== $link->getAttribute('data-link')) {
+                continue;
+            }
+            return sprintf('%s%s', $this->baseUrl, $link->getAttribute('href'));
+        }
+
+        return null;
     }
 
-    private function iterateDailyUrls() : iterable
+    private function fetchComicFromDiscovered() : Comic
     {
-        $date = new DateTimeImmutable();
-        $i = 0;
-        do {
-            yield sprintf($this->dailyFormat, $date->format($this->dateFormat));
-
-            $i += 1;
-            $interval = new DateInterval(sprintf('P%dD', $i));
-            $date = $date->sub($interval);
-        } while ($i < 7);
     }
 }

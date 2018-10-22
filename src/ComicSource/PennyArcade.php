@@ -3,8 +3,8 @@
 namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
+use PhpCss;
 use SimpleXMLElement;
-use Zend\Dom\Query as DomQuery;
 
 /**
  * The Penny Arcade feed provides a link to the **page** containing the comic,
@@ -18,6 +18,8 @@ use Zend\Dom\Query as DomQuery;
  */
 class PennyArcade extends AbstractRssSource
 {
+    use XPathTrait;
+
     protected static $comics = array(
         'pennyarcade' => 'Penny Arcade',
     );
@@ -65,11 +67,10 @@ class PennyArcade extends AbstractRssSource
             ));
         }
 
-        $dom  = new DomQuery();
-        $dom->setDocumentHtml($page);
+        $xpath = $this->getXPathForDocument($page);
+        $results = $xpath->query(PhpCss::toXpath($this->domQuery));
 
-        $r = $dom->execute($this->domQuery);
-        if (!$r->count()) {
+        if (false === $results || ! count($results)) {
             return $this->registerError(sprintf(
                 'Comic at "%s" is unreachable',
                 $url
@@ -77,7 +78,7 @@ class PennyArcade extends AbstractRssSource
         }
 
         $imgUrl = false;
-        foreach ($r as $node) {
+        foreach ($results as $node) {
             if ($node->hasAttribute('src')) {
                 $imgUrl = $node->getAttribute('src');
                 break;

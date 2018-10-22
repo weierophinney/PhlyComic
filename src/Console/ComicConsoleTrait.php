@@ -45,7 +45,7 @@ EOT;
      * @param string $message
      * @param null|\Exception $e
      */
-    private function reportError(Console $console, $message, $e = null)
+    private function reportError(SymfonyStyle $console, $message, $e = null)
     {
         $console->caution($message);
         if ($e) {
@@ -62,14 +62,7 @@ EOT;
         $console->text(sprintf('<info>Fetching "%s"</>', $name));
         $console->progressStart();
 
-        try {
-            $comic = $source->fetch();
-        } catch (\Exception $e) {
-            $console->progressFinish();
-            $this->status = 1;
-            $this->reportError($console, sprintf('Unable to fetch comic "%s"', $name), $e);
-            return null;
-        }
+        $comic = $source->fetch();
 
         $console->progressFinish();
 
