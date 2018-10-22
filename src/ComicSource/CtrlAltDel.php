@@ -2,7 +2,8 @@
 
 namespace PhlyComic\ComicSource;
 
-use Zend\Dom\Query as DomQuery;
+use DOMXPath;
+use PhpCss;
 
 class CtrlAltDel extends AbstractDomSource
 {
@@ -26,9 +27,9 @@ class CtrlAltDel extends AbstractDomSource
         return false;
     }
 
-    protected function getDailyUrl($imgUrl, DomQuery $dom)
+    protected function getDailyUrl($imgUrl, DOMXPath $xpath)
     {
-        foreach ($dom->execute($this->domQueryForLink) as $node) {
+        foreach ($xpath->query(PhpCss::toXpath($this->domQueryForLink)) as $node) {
             if (! $node->hasAttribute('href')) {
                 continue;
             }

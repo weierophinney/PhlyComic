@@ -2,9 +2,11 @@
 
 namespace PhlyComic\ComicSource;
 
+use DOMDocument;
+use DOMXPath;
 use PhlyComic\Comic;
+use PhpCss;
 use SimpleXMLElement;
-use Zend\Dom\Query as DomQuery;
 
 /**
  * The SMBC feed provides a link to the **page** containing the comic,
@@ -44,11 +46,12 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
 
     protected function getImageFromDescription($description, $url)
     {
-        $dom = new DomQuery();
-        $dom->setDocumentHtml($description);
-        $r = $dom->execute($this->domQuery);
+        $document = new DOMDocument('1.0', 'UTF-8');
+        $document->loadHTML($description);
+        $xpath = new DOMXPath($document);
+        $results = $xpath->query(PhpCss::toXpath($this->domQuery));
 
-        if (! $r->count()) {
+        if (false === $results || ! count($results)) {
             return $this->registerError(sprintf(
                 'Comic at "%s" is unreachable',
                 $url
@@ -56,7 +59,7 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
         }
 
         $imgUrl = false;
-        foreach ($r as $node) {
+        foreach ($results as $node) {
             if ($node->hasAttribute('src')) {
                 $imgUrl = $node->getAttribute('src');
                 break;
