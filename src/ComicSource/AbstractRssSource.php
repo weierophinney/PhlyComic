@@ -2,8 +2,11 @@
 
 namespace PhlyComic\ComicSource;
 
+use DOMDocument;
 use PhlyComic\Comic;
 use SimpleXMLElement;
+
+use function simplexml_import_dom;
 
 abstract class AbstractRssSource extends AbstractComicSource
 {
@@ -47,7 +50,11 @@ abstract class AbstractRssSource extends AbstractComicSource
 
         // Retrieve feed to parse
         $rawFeed = $this->fetchFeed($this->feedUrl);
-        $sxl = new SimpleXMLElement($rawFeed);
+
+        $sxl = $this->getXmlElement($rawFeed);
+        if ($sxl instanceof Comic) {
+            return $sxl;
+        }
 
         $data = $this->getDataFromFeed($sxl);
 
@@ -57,8 +64,8 @@ abstract class AbstractRssSource extends AbstractComicSource
 
         if (!$data) {
             return $this->registerError(sprintf(
-                static::$comics[$this->comicShortName]
-                . ' feed does not include image description containing image URL: %s',
+                '%s feed does not include image description containing image URL: %s',
+                static::$comics[$this->comicShortName],
                 $this->content
             ));
         }
@@ -81,6 +88,27 @@ abstract class AbstractRssSource extends AbstractComicSource
 
         $namespacedChildren = $item->children($this->tagNamespace);
         return (string) $namespacedChildren->{$this->tagWithImage};
+    }
+
+    /**
+     * @return SimpleXMLElement|Comic Returns comic representing an error if an
+     *     error occurs during parsing; otherwise, returns the SimpleXMLElement
+     *     representing the content.
+     */
+    protected function getXmlElement(string $xml)
+    {
+        $dom = new DOMDocument('1.0', 'utf-8');
+        $dom->recover = true;
+        $result = $dom->loadXML($xml);
+        if (! $result) {
+            return $this->registerError(sprintf(
+                '%s feed cannot be parsed',
+                static::$comics[$this->comicShortName],
+                $this->content
+            ));
+        }
+
+        return simplexml_import_dom($dom);
     }
 
     protected function getDataFromFeed(SimpleXMLElement $feed)
