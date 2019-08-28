@@ -29,7 +29,7 @@
         "php": "^7.1",
         "ext-curl": "*",
         "symfony/console": "^4.1",
-        "Carica/PhpCss": "^1.0"
+        "carica/phpcss": "^1.0"
     },
     "autoload": {
         "psr-4": {
