@@ -100,7 +100,7 @@ abstract class AbstractRssSource extends AbstractComicSource
         $dom = new DOMDocument('1.0', 'utf-8');
         $dom->recover = true;
         $result = $dom->loadXML($xml);
-        if (! $result) {
+        if (! $result || null === $dom->firstChild) {
             return $this->registerError(sprintf(
                 '%s feed cannot be parsed',
                 static::$comics[$this->comicShortName],
