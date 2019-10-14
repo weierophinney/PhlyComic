@@ -8,6 +8,7 @@ namespace PhlyComic\Console;
 
 use PhlyComic\Comic;
 use PhlyComic\ComicFactory;
+use RuntimeException;
 use Spatie\Async\Pool;
 use stdClass;
 use Symfony\Component\Console\Command\Command;
@@ -138,7 +139,7 @@ class FetchAllComics extends Command
         $pool = Pool::create()
             ->concurrency($this->processes)
             ->timeout(15)
-            ->autoload(__DIR__ . '/../../vendor/autoload.php')
+            ->autoload($this->detectAutoloader())
             ->sleepTime(50000);
 
         $content = (object) ['html' => ''];
@@ -211,6 +212,24 @@ class FetchAllComics extends Command
             $comic->getName(),
             $comic->getDaily(),
             $comic->getImage()
+        );
+    }
+
+    private function detectAutoloader() : string
+    {
+        $autoloaders = [
+            realpath(getcwd()) . '/vendor/autoload.php',
+            realpath(__DIR__) . '/../../vendor/autoload.php',
+        ];
+
+        foreach ($autoloaders as $autoloader) {
+            if (file_exists($autoloader)) {
+                return $autoloader;
+            }
+        }
+
+        throw new RuntimeException(
+            'Cannot detect autoloader; have you properly run `composer install`?'
         );
     }
 }
