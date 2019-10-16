@@ -142,7 +142,7 @@ class FetchAllComics extends Command
             ->autoload($this->detectAutoloader())
             ->sleepTime(50000);
 
-        $content = (object) ['html' => ''];
+        $content = (object) ['comics' => []];
         foreach ($comics as $name) {
             $console->text(sprintf('<info>Queuing retrieval of "%s"</info>', $name));
             $pool
@@ -180,7 +180,7 @@ class FetchAllComics extends Command
                     }
 
                     $console->text(sprintf('<info>Completed retrieval of "%s</info>', $name));
-                    $content->html .= $this->createComicOutput($result->comic);
+                    $content->comics[$name] = $this->createComicOutput($result->comic);
                 })
                 ->catch(function (Throwable $e) use ($name, $console) {
                     $this->reportError($console, sprintf(
@@ -192,7 +192,8 @@ class FetchAllComics extends Command
         }
 
         $pool->wait();
-        return $content->html;
+        ksort($content->comics, SORT_NATURAL);
+        return implode("\n", $content->comics);
     }
 
     private function createComicOutput(Comic $comic) : string
