@@ -85,6 +85,10 @@ class FetchAllComics extends Command
             if (ctype_digit($processes) && (int) $processes > -1) {
                 $this->processes = (int) $processes;
             }
+
+            if (is_int($processes)) {
+                $this->processes = $processes;
+            }
         }
     }
 
