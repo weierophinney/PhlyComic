@@ -95,10 +95,7 @@ class GoComics extends AbstractDomSource
     {
         $page = file_get_contents($this->comicBase);
         if (! $page) {
-            return $this->registerError(sprintf(
-                'Comic at "%s" is unreachable',
-                $this->comicBase
-            ));
+            return null;
         }
 
         $comic = null;
