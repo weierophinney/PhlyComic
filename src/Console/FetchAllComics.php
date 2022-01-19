@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
  * @copyright Copyright (c) Matthew Weier O'Phinney
@@ -10,7 +11,6 @@ use PhlyComic\Comic;
 use PhlyComic\ComicFactory;
 use RuntimeException;
 use Spatie\Async\Pool;
-use stdClass;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -60,7 +60,7 @@ class FetchAllComics extends Command
         );
     }
 
-    public function initialize(InputInterface $input, OutputInterface $output) : void
+    public function initialize(InputInterface $input, OutputInterface $output): void
     {
         $io = new SymfonyStyle($input, $output);
         $this->status = 0;
@@ -95,7 +95,7 @@ class FetchAllComics extends Command
     /**
      * Fetch all comics and write to a file
      */
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($this->status > 0) {
             return $this->status;
@@ -125,7 +125,7 @@ class FetchAllComics extends Command
         return 0;
     }
 
-    private function fetchSync(array $comics, SymfonyStyle $console) : string
+    private function fetchSync(array $comics, SymfonyStyle $console): string
     {
         $html  = '';
         foreach ($comics as $name) {
@@ -138,7 +138,7 @@ class FetchAllComics extends Command
         return $html;
     }
 
-    private function fetchAsync(array $comics, SymfonyStyle $console) : string
+    private function fetchAsync(array $comics, SymfonyStyle $console): string
     {
         $pool = Pool::create()
             ->concurrency($this->processes)
@@ -200,7 +200,7 @@ class FetchAllComics extends Command
         return implode("\n", $content->comics);
     }
 
-    private function createComicOutput(Comic $comic) : string
+    private function createComicOutput(Comic $comic): string
     {
         if ($comic->hasError()) {
             return sprintf(
@@ -220,7 +220,7 @@ class FetchAllComics extends Command
         );
     }
 
-    private function detectAutoloader() : string
+    private function detectAutoloader(): string
     {
         $autoloaders = [
             realpath(getcwd()) . '/vendor/autoload.php',
