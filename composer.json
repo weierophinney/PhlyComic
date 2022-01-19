@@ -26,11 +26,11 @@
         }
     },
     "require": {
-        "php": "^7.1 || ^8.0",
+        "php": "~7.4.0 || ~8.0.0 || ~8.1.0",
         "ext-curl": "*",
         "symfony/console": "^5.0",
-        "carica/phpcss": "^1.0",
-        "spatie/async": "^1.1"
+        "carica/phpcss": "^2.0",
+        "spatie/async": "^1.5"
     },
     "autoload": {
         "psr-4": {

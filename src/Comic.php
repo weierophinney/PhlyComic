@@ -3,6 +3,7 @@
 namespace PhlyComic;
 
 use JsonSerializable;
+use ReturnTypeWillChange;
 
 /**
  * Value object describing a comic
@@ -26,6 +27,7 @@ class Comic implements ComicDescription, JsonSerializable
     /**
      * Implemented to allow debugging via json_encode
      */
+    #[ReturnTypeWillChange]
     public function jsonSerialize()
     {
         return [
