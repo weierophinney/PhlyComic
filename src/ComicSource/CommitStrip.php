@@ -2,15 +2,46 @@
 
 namespace PhlyComic\ComicSource;
 
-class CommitStrip extends AbstractRssSource
+use DOMXPath;
+use PhpCss;
+
+class CommitStrip extends AbstractDomSource
 {
     protected static $comics = array(
         'commitstrip' => 'CommitStrip',
     );
 
-    protected $comicBase      = 'http://www.commitstrip.com/';
+    protected $comicBase      = 'https://www.commitstrip.com/';
     protected $comicShortName = 'commitstrip';
-    protected $feedUrl        = 'http://www.commitstrip.com/feed/';
-    protected $tagNamespace   = 'http://purl.org/rss/1.0/modules/content/';
-    protected $tagWithImage   = 'encoded';
+
+    protected $dailyFormat     = 'https://www.commitstrip.com/';
+    protected $domIsHtml       = true;
+    protected $domQuery        = '.excerpt img';
+    protected $domQueryForLink = '.excerpt a';
+    protected $useComicBase    = true;
+
+    protected function validateImageSrc($src)
+    {
+        if (strstr($src, '//www.commitstrip.com/wp-content/uploads/')) {
+            return true;
+        }
+        return false;
+    }
+
+    protected function getDailyUrl($imgUrl, DOMXPath $xpath)
+    {
+        foreach ($xpath->query(PhpCss::toXpath($this->domQueryForLink)) as $node) {
+            if (! $node->hasAttribute('href')) {
+                continue;
+            }
+
+            $href = $node->getAttribute('href');
+            if (! preg_match('#/\d{4}/\d{2}/\d{2}/#', $href)) {
+                continue;
+            }
+
+            return $href;
+        }
+        return $this->comicBase;
+    }
 }
