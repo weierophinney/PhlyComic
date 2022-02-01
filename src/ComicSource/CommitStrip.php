@@ -3,6 +3,7 @@
 namespace PhlyComic\ComicSource;
 
 use DOMXPath;
+use PhlyComic\Comic;
 use PhpCss;
 
 class CommitStrip extends AbstractDomSource
@@ -19,6 +20,48 @@ class CommitStrip extends AbstractDomSource
     protected $domQuery        = '.excerpt img';
     protected $domQueryForLink = '.excerpt a';
     protected $useComicBase    = true;
+
+    public function fetch()
+    {
+        $href = $this->fetchMostRecentComicPageHrefFromLandingPage();
+        if (! $href) {
+            return $this->registerError(sprintf(
+                'Unable to find most recent comic for "%s"',
+                $this->comicShortName
+            ));
+        }
+
+        $html  = file_get_contents($href);
+        $xpath = $this->getXPathForDocument($html);
+        $found = false;
+        foreach ($xpath->query(PhpCss::toXpath('.entry-content img')) as $node) {
+            $found = $node;
+            break;
+        }
+
+        if (! $found) {
+            return $this->registerError(sprintf(
+                'Unable to find most recent comic for "%s"; page has unexpected structure.',
+                $this->comicShortName
+            ));
+        }
+
+        $image = $node->getAttribute('src');
+
+        if (! $image) {
+            return $this->registerError(sprintf(
+                'Unable to find most recent comic for "%s"; img tag missing.',
+                $this->comicShortName
+            ));
+        }
+
+        return new Comic(
+            static::$comics[$this->comicShortName],
+            $this->comicBase,
+            $href,
+            $image
+        );
+    }
 
     protected function validateImageSrc($src)
     {
@@ -43,5 +86,29 @@ class CommitStrip extends AbstractDomSource
             return $href;
         }
         return $this->comicBase;
+    }
+
+    private function fetchMostRecentComicPageHrefFromLandingPage(): ?string
+    {
+        $page = file_get_contents($this->comicBase);
+        if (! $page) {
+            return null;
+        }
+
+        $xpath = $this->getXPathForDocument($page);
+        foreach ($xpath->query(PhpCss::toXpath($this->domQueryForLink)) as $node) {
+            if (! $node->hasAttribute('href')) {
+                continue;
+            }
+
+            $href = $node->getAttribute('href');
+            if (! preg_match('#/\d{4}/\d{2}/\d{2}/#', $href)) {
+                continue;
+            }
+
+            return $href;
+        }
+
+        return null;
     }
 }
