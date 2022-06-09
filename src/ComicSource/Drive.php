@@ -2,21 +2,25 @@
 
 namespace PhlyComic\ComicSource;
 
-class Drive extends AbstractRssSource
+use SimpleXMLElement;
+
+class Drive extends AbstractRssAndDomSource
 {
     protected static $comics = array(
         'drive' => 'drive',
     );
 
-    protected $comicBase      = 'http://www.drivecomic.com';
-    protected $comicShortName = 'drive';
-    protected $feedUrl        = 'http://cdn.drivecomic.com/rss.xml';
-    protected $tagNamespace   = 'http://purl.org/rss/1.0/modules/content/';
-    protected $tagWithImage   = 'encoded';
+    protected $comicBase           = 'https://www.drivecomic.com';
+    protected $comicShortName      = 'drive';
+    protected $feedUrl             = 'https://www.drivecomic.com/comic/feed/';
+    protected $tagNamespace        = 'http://purl.org/rss/1.0/modules/content/';
+    protected $tagWithImage        = 'encoded';
+    protected $domQuery            = '#unspliced-comic img.size-full';
+    protected string $domAttribute = 'data-src-webp';
 
-    protected function isOfInterest($item)
+    protected function validateFeedItem(SimpleXMLElement $item): bool
     {
-        $link = (string) $item->guid;
-        return preg_match('#/archive/#', $link);
+        $description = (string) $item->description;
+        return ! preg_match('/must be a member/', $description);
     }
 }

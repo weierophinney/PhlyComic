@@ -4,6 +4,8 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 use PhpCss;
+use RuntimeException;
+use PhpCss\Exception\ParserException;
 use SimpleXMLElement;
 
 /**
@@ -23,6 +25,11 @@ abstract class AbstractRssAndDomSource extends AbstractRssSource
      * order to identify the image tag.
      */
     protected $domQuery       = '';
+
+    /**
+     * Which attribute of an img tag to use as the image source link.
+     */
+    protected string $domAttribute = 'src';
 
     abstract protected function validateFeedItem(SimpleXMLElement $item) : bool;
 
@@ -82,8 +89,8 @@ abstract class AbstractRssAndDomSource extends AbstractRssSource
 
         $imgUrl = false;
         foreach ($results as $node) {
-            if ($node->hasAttribute('src')) {
-                $imgUrl = $node->getAttribute('src');
+            if ($node->hasAttribute($this->domAttribute)) {
+                $imgUrl = $node->getAttribute($this->domAttribute);
                 break;
             }
         }
