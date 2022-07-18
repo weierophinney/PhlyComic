@@ -25,6 +25,7 @@ abstract class ComicFactory
         'PhlyComic\ComicSource\ListenToMe',
         'PhlyComic\ComicSource\LunarBaboon',
         'PhlyComic\ComicSource\NotInventedHere',
+        'PhlyComic\ComicSource\Oatmeal',
         'PhlyComic\ComicSource\PennyArcade',
         'PhlyComic\ComicSource\PhDComics',
         'PhlyComic\ComicSource\ReptilisRex',

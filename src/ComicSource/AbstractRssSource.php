@@ -2,11 +2,10 @@
 
 namespace PhlyComic\ComicSource;
 
-use DOMDocument;
 use PhlyComic\Comic;
 use SimpleXMLElement;
 
-use function simplexml_import_dom;
+use function simplexml_load_string;
 
 abstract class AbstractRssSource extends AbstractComicSource
 {
@@ -97,10 +96,8 @@ abstract class AbstractRssSource extends AbstractComicSource
      */
     protected function getXmlElement(string $xml)
     {
-        $dom = new DOMDocument('1.0', 'utf-8');
-        $dom->recover = true;
-        $result = $dom->loadXML($xml);
-        if (! $result || null === $dom->firstChild) {
+        $feed = simplexml_load_string($xml);
+        if ($feed === false) {
             return $this->registerError(sprintf(
                 '%s feed cannot be parsed',
                 static::$comics[$this->comicShortName],
@@ -108,7 +105,7 @@ abstract class AbstractRssSource extends AbstractComicSource
             ));
         }
 
-        return simplexml_import_dom($dom);
+        return $feed;
     }
 
     protected function getDataFromFeed(SimpleXMLElement $feed)
@@ -148,6 +145,8 @@ abstract class AbstractRssSource extends AbstractComicSource
         if (preg_match('/\<img [^>]*src="(?P<src>[^"]+)"/', $content, $matches)) {
             return $matches['src'];
         }
+
+        fwrite(STDERR, "Unable to find img tag: $content\n");
         return false;
     }
 
