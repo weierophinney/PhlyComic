@@ -44,12 +44,12 @@ class FetchComic extends Command
         $this->status = 0;
         $io = new SymfonyStyle($input, $output);
 
-        if (! $this->validateComicAlias($io, $input->getArgument('comic'))) {
+        if (! $this->validateComicAlias($io, $input->getArgument('comic') ?: '')) {
             $this->status = 1;
         }
 
         $outputPath = $input->getOption('output');
-        if ($outputPath && ! $this->validateOutputValue($io, $outputPath)) {
+        if ($outputPath && ! $this->validateOutputValue($io, $outputPath ?: '')) {
             $this->status = 1;
         }
     }

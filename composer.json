@@ -28,7 +28,7 @@
     "require": {
         "php": "~7.4.0 || ~8.0.0 || ~8.1.0",
         "ext-curl": "*",
-        "symfony/console": "^5.0",
+        "symfony/console": "^5.0 || ^6.0",
         "carica/phpcss": "^2.0",
         "spatie/async": "^1.5"
     },
