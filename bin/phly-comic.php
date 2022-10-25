@@ -26,7 +26,7 @@ switch (true) {
         throw new RuntimeException('Unable to locate Composer autoloader; please run "composer install".');
 }
 
-define('VERSION', '2.4.2');
+define('VERSION', '2.4.3dev');
 
 $application = new Application('PhlyComic', VERSION);
 $application->add(new ListComics());
