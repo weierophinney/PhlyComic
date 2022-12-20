@@ -1,5 +1,4 @@
-PhlyComic: retrieve comic sources
-=================================
+# PhlyComic: retrieve comic sources
 
 This module/library is intended for retrieving URLs to comics found on the web
 for purposes of linking and/or viewing. The comics remain the property of
@@ -7,47 +6,41 @@ respective copyright holders; I do not endorse retrieving the comics for
 local storage, and request that if you create markup for displaying them
 that you link to the originals.
 
-Requirements
-------------
+## Requirements
 
-* PHP >= 5.3.3
-* Zend Framework 2 >= 2.0.0beta1, specifically: 
-  * Zend\Console, which is used for the console scripts
-  * Zend\Dom\Query, used for some web scraping
-  * Zend\Module, but only if you want to integrate this into a ZF2 MVC
-    application
+- PHP >= 7.4.0
+- symfony/console 5 or 6
+- carica/phpcss 2
+- spatie/async 1.5
 
-Usage
------
+## Usage
 
-This module is ZF2 Console-aware. It defines the following console tools:
+This library exposes the command phly-comic.php. It defines the following commands:
 
-- `phlycomic list`, which will list all available comics
-- `phlycomic fetch comic --name`, which allows you to fetch a single comic by name
-- `phlycomic fetch all`, which will fetch all comics at once and write to a single file
+- `list-comics`, which will list all available comics
+- `fetch comic [name]`, which allows you to fetch a single comic by name
+- `fetch-all`, which will fetch all comics at once and write to a single file
 
 Comic files are written by default to `data/comics/` of your application; you
-can change this by overriding the configuration; see `config/module.config.php` for
-details.
+can change this via the `-o|--output` option of each command.
 
 Typical usage will look like this from your application:
 
 ```bash
-% php public/index.php phlycomic list
+% ./vendor/bin/phly-comic.php list-comics
 ```
 
 ```bash
-% php public/index.php phlycomic fetch comic --name=nih
+% ./vendor/bin/phly-comic.php fetch nih
 ```
 
 ```bash
-% php public/index.php phlycomic fetch all
+% ./vendor/bin/phly-comic.php fetch-all
 ```
 
-License
-----
+## License
 
-Copyright (c) 2012, Matthew Weier O'Phinney
+Copyright (c) , Matthew Weier O'Phinney
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
