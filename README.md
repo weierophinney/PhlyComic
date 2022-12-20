@@ -27,20 +27,20 @@ can change this via the `-o|--output` option of each command.
 Typical usage will look like this from your application:
 
 ```bash
-% ./vendor/bin/phly-comic.php list-comics
+$ ./vendor/bin/phly-comic.php list-comics
 ```
 
 ```bash
-% ./vendor/bin/phly-comic.php fetch nih
+$ ./vendor/bin/phly-comic.php fetch nih
 ```
 
 ```bash
-% ./vendor/bin/phly-comic.php fetch-all
+$ ./vendor/bin/phly-comic.php fetch-all
 ```
 
 ## License
 
-Copyright (c) , Matthew Weier O'Phinney
+Copyright (c) Matthew Weier O'Phinney
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without modification,
