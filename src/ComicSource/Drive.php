@@ -12,7 +12,7 @@ class Drive extends AbstractRssAndDomSource
 
     protected $comicBase           = 'https://www.drivecomic.com';
     protected $comicShortName      = 'drive';
-    protected $feedUrl             = 'https://www.drivecomic.com/comic/feed/';
+    protected $feedUrl             = 'https://www.drivecomic.com/feed/';
     protected $tagNamespace        = 'http://purl.org/rss/1.0/modules/content/';
     protected $tagWithImage        = 'encoded';
     protected $domQuery            = '#unspliced-comic img.size-full';
