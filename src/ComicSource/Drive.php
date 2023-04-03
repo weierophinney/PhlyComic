@@ -15,7 +15,7 @@ class Drive extends AbstractRssAndDomSource
     protected $feedUrl             = 'https://www.drivecomic.com/feed/';
     protected $tagNamespace        = 'http://purl.org/rss/1.0/modules/content/';
     protected $tagWithImage        = 'encoded';
-    protected $domQuery            = '#unspliced-comic img.size-full';
+    protected $domQuery            = 'img.size-full';
     protected string $domAttribute = 'data-src-webp';
 
     protected function validateFeedItem(SimpleXMLElement $item): bool
