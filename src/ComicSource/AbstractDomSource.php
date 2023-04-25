@@ -41,6 +41,11 @@ abstract class AbstractDomSource extends AbstractComicSource
     protected $domIsHtml = false;
 
     /**
+     * @var string DOM attribute of img tag to use
+     */
+    protected $domAttribute = 'src';
+
+    /**
      * @var bool Use the comicBase instead of the daily format to retrieve
      */
     protected $useComicBase = false;
@@ -91,6 +96,7 @@ abstract class AbstractDomSource extends AbstractComicSource
                 $url
             ));
         }
+        file_put_contents(getcwd() . '/data/comics/drive-base.html', $page);
 
         $xpath = $this->getXPathForDocument($page);
         $results = $xpath->query(PhpCss::toXpath($this->domQuery));
@@ -102,14 +108,16 @@ abstract class AbstractDomSource extends AbstractComicSource
         }
 
         $imgUrl = false;
+        printf("Found %d results\n", $results->length);
         foreach ($results as $node) {
-            if (! $node->hasAttribute('src')) {
+            if (! $node->hasAttribute($this->domAttribute)) {
                 continue;
             }
 
-            $src = $node->getAttribute('src');
+            $src = $node->getAttribute($this->domAttribute);
 
             if ($this->validateImageSrc($src)) {
+                printf("Using node: %s\n", $node->textContent);
                 $imgUrl = $this->formatImageSrc($src);
                 break;
             }
