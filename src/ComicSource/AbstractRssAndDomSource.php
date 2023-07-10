@@ -69,7 +69,7 @@ abstract class AbstractRssAndDomSource extends AbstractRssSource
      */
     protected function getImageFromLink($url)
     {
-        $page = file_get_contents($url);
+        $page = $this->fetchURL($url);
         if (! $page) {
             return $this->registerError(sprintf(
                 'Comic at "%s" is unreachable',
@@ -82,7 +82,7 @@ abstract class AbstractRssAndDomSource extends AbstractRssSource
 
         if (false === $results || ! count($results)) {
             return $this->registerError(sprintf(
-                'Comic at "%s" is unreachable',
+                'Comic at "%s" cannot be found',
                 $url
             ));
         }
@@ -103,5 +103,19 @@ abstract class AbstractRssAndDomSource extends AbstractRssSource
         }
 
         return $imgUrl;
+    }
+
+    protected function fetchURL(string $url): string
+    {
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 6.1) AppleWebKit/537.2 (KHTML, like Gecko) Chrome/22.0.1216.0 Safari/537.2');
+
+        $html = curl_exec($ch);
+
+        curl_close($ch);
+
+        return $html;
     }
 }

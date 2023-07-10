@@ -10,10 +10,10 @@ class FoxTrot extends AbstractRssAndDomSource
         'foxtrot' => 'FoxTrot',
     );
 
-    protected $comicBase      = 'http://www.foxtrot.com';
+    protected $comicBase      = 'https://www.foxtrot.com';
     protected $comicShortName = 'foxtrot';
     protected $domQuery       = 'figure.wp-block-image img';
-    protected $feedUrl        = 'http://www.foxtrot.com/feed/';
+    protected $feedUrl        = 'https://www.foxtrot.com/feed/';
     protected $tagNamespace   = 'http://purl.org/rss/1.0/modules/content/';
     protected $tagWithImage   = 'encoded';
 
