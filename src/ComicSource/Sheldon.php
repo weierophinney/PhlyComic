@@ -12,7 +12,7 @@ class Sheldon extends AbstractComicSource
     private const BASE_URL = 'http://www.sheldoncomics.com/';
     private const SELECTOR_NEXT = 'a#sidenav-next';
     private const SELECTOR_PREV = 'a#sidenav-prev';
-    private const SELECTOR_COMIC = 'img#strip';
+    private const SELECTOR_COMIC = 'div#comic img';
 
     protected static $comics = array(
         'sheldon' => 'Sheldon',
