@@ -10,8 +10,12 @@ class Drive extends AbstractDomSource
 
     protected $comicBase           = 'https://www.drivecomic.com';
     protected $comicShortName      = 'drive';
-    protected $domQuery            = 'div#spliced-comic img.size-full';
-    protected $domAttribute        = 'data-src-webp';
+    protected $domQuery            = 'div#unspliced-comic img';
     protected $domIsHtml           = true;
     protected $useComicBase        = true;
+
+    protected function validateImageSrc($src): bool
+    {
+        return (bool) preg_match('#^https?://#', $src);
+    }
 }
