@@ -18,11 +18,11 @@ trait ComicConsoleTrait
      * @var string
      */
     private $comicTemplate = <<< 'EOT'
-<div class="comic">
-    <h4><a href="%s">%s</a></h4>
-    <p><a href="%s"><img src="%s"/></a></p>
-</div>
-EOT;
+        <div class="comic">
+            <h4><a href="%s">%s</a></h4>
+            <p><a href="%s"><img referrerpolicy="no-referrer" src="%s"/></a></p>
+        </div>
+        EOT;
 
     /**
      * Template used for errors
@@ -30,11 +30,11 @@ EOT;
      * @var string
      */
     private $errorTemplate = <<< 'EOT'
-<div class="comic">
-    <h4><a href="%s">%s</a></h4>
-    <p class="error">%s</p>
-</div>
-EOT;
+        <div class="comic">
+            <h4><a href="%s">%s</a></h4>
+            <p class="error">%s</p>
+        </div>
+        EOT;
 
     private $status;
 
