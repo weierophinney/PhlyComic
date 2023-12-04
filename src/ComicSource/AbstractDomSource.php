@@ -96,7 +96,6 @@ abstract class AbstractDomSource extends AbstractComicSource
                 $url
             ));
         }
-        file_put_contents(getcwd() . '/data/comics/drive-base.html', $page);
 
         $xpath = $this->getXPathForDocument($page);
         $results = $xpath->query(PhpCss::toXpath($this->domQuery));
