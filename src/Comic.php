@@ -3,74 +3,70 @@
 namespace PhlyComic;
 
 use JsonSerializable;
-use ReturnTypeWillChange;
 
 /**
  * Value object describing a comic
  */
-class Comic implements ComicDescription, JsonSerializable
+class Comic implements JsonSerializable
 {
-    protected $name;
-    protected $link;
-    protected $daily;
-    protected $image;
-    protected $error;
-
-    public function __construct($name, $link = null, $daily = null, $image = null)
-    {
-        $this->name  = $name;
-        $this->link  = $link;
-        $this->daily = $daily;
-        $this->image = $image;
+    public static function createBaseComic(
+        string $name,
+        string $title,
+        string $link,
+    ): self {
+        return new self($name, $title, $link);
     }
 
     /**
      * Implemented to allow debugging via json_encode
      */
-    #[ReturnTypeWillChange]
-    public function jsonSerialize()
+    public function jsonSerialize(): array
     {
         return [
-            'name'  => $this->name,
-            'link'  => $this->link,
-            'daily' => $this->daily,
-            'image' => $this->image,
-            'error' => $this->error,
+            'name'               => $this->name,
+            'title'              => $this->title,
+            'url'                => $this->url,
+            'instance_url'       => $this->instanceUrl,
+            'instance_image_url' => $this->instanceImageUrl,
+            'error'              => $this->error,
         ];
     }
 
-    public function getName()
+    public function withInstance(string $url, string $imageUrl): self
     {
-        return $this->name;
+        return new self(
+            $this->name,
+            $this->title,
+            $this->url,
+            $url,
+            $imageUrl,
+        );
     }
 
-    public function getLink()
+    public function withError(string $error): self
     {
-        return $this->link;
+        return new self(
+            $this->name,
+            $this->title,
+            $this->url,
+            $this->instanceUrl,
+            $this->instanceImageUrl,
+            $error,
+        );
     }
 
-    public function getDaily()
+    public function hasError(): bool
     {
-        return $this->daily;
+        return null !== $this->error;
     }
 
-    public function getImage()
-    {
-        return $this->image;
-    }
-
-    public function setError($error)
-    {
-        $this->error = $error;
-    }
-
-    public function hasError()
-    {
-        return (null !== $this->error);
-    }
-
-    public function getError()
-    {
-        return $this->error;
+    private function __construct(
+        public readonly string $name,
+        public readonly string $title,
+        public readonly string $url = null,
+        public readonly ?string $instanceUrl = null,
+        public readonly ?string $instanceImageUrl = null,
+        public readonly ?string $error = null,
+    ) {
     }
 }
