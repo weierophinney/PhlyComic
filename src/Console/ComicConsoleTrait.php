@@ -6,15 +6,17 @@
 
 namespace PhlyComic\Console;
 
+use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use PhlyComic\Comic;
 use PhlyComic\ComicFactory;
+use PhlyComic\HttpClient;
 use Psr\Http\Client\ClientInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 trait ComicConsoleTrait
 {
-    private ?ClientInterface $client = null;
+    private ?HttpClient $client = null;
     private ?ComicFactory $factory = null;
 
     /**
@@ -114,10 +116,13 @@ trait ComicConsoleTrait
         return $this->factory;
     }
 
-    private function getHttpClient(): ClientInterface
+    private function getHttpClient(): HttpClient
     {
         if (null === $this->client) {
-            $this->client = Psr18ClientDiscovery::find();
+            $this->client = new HttpClient(
+                Psr18ClientDiscovery::find(),
+                Psr17FactoryDiscovery::findRequestFactory(),
+            );
         }
 
         return $this->client;
