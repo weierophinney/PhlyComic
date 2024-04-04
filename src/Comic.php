@@ -63,7 +63,7 @@ class Comic implements JsonSerializable
     private function __construct(
         public readonly string $name,
         public readonly string $title,
-        public readonly string $url = null,
+        public readonly string $url,
         public readonly ?string $instanceUrl = null,
         public readonly ?string $instanceImageUrl = null,
         public readonly ?string $error = null,

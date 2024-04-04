@@ -2,16 +2,39 @@
 
 namespace PhlyComic;
 
-use DomainException;
-use InvalidArgumentException;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use RuntimeException;
 
-abstract class ComicFactory
+final class ComicFactory implements ContainerInterface
 {
-    /** @var array<non-empty-string, class-string<ComicSource>> */
-    protected static $aliasMap = [];
+    public function has(string $name): bool
+    {
+        return array_key_exists($name, $this->aliasMap);
+    }
+
+    public function get(string $name): ComicSource
+    {
+        if (! array_key_exists($name, $this->aliasMap)) {
+            throw new class($name) extends RuntimeException implements ContainerExceptionInterface {
+                public function __construct(string $name)
+                {
+                    parent::__construct("Comic source by name '$name' does not exist");
+                }
+            };
+        }
+
+        $class = $this->aliasMap[$name];
+        return new $class();
+    }
+
+    public function getSupported(): array
+    {
+        return $this->supported;
+    }
 
     /** @var list<class-string<ComicSource>> List of comic source classes */
-    protected static $comicClasses = [
+    private const COMIC_SOURCES = [
         'PhlyComic\ComicSource\BasicInstructions',
         'PhlyComic\ComicSource\CommitStrip',
         'PhlyComic\ComicSource\CtrlAltDel',
@@ -37,81 +60,23 @@ abstract class ComicFactory
         'PhlyComic\ComicSource\Xkcd',
     ];
 
+    /** @var array<non-empty-string, class-string> */
+    private readonly array $aliasMap;
+
     /** @var array<class-string, Comic> */
-    protected static $supported = [];
+    private readonly array $supported;
 
-    /**
-     * Retrieve a source class for a given comic
-     *
-     * @param  string $name Comic "alias" used within a comic source
-     */
-    public static function factory(string $name): ComicSource
+    private function __construct()
     {
-        static::initSupported();
-
-        if (! array_key_exists($name, static::$aliasMap)) {
-            throw new InvalidArgumentException(sprintf(
-                'Comic "%s" is not supported',
-                $name
-            ));
+        $aliasMap  = [];
+        $supported = [];
+        foreach (self::COMIC_SOURCES as $class) {
+            $comic                  = $class::provides();
+            $aliasMap[$comic->name] = $class;
+            $supported[$class]      = $comic;
         }
 
-        $class  = static::$aliasMap[$name];
-        $source = new $class();
-
-        if (!$source instanceof ComicSource) {
-            throw new DomainException(sprintf(
-                'Comic "%s" does not have a valid ComicSource (uses "%s") associated with it',
-                $name,
-                $class
-            ));
-        }
-
-        return $source;
-    }
-
-    /**
-     * Add a comic source class to use with the factory
-     *
-     * Must implement ComicSource.
-     *
-     * @param  class-string<ComicSource> $classname
-     */
-    public static function addSourceClass($classname): void
-    {
-        static::$comicClasses[] = $classname;
-        static::$supported = [];
-    }
-
-    /**
-     * Get list of supported comics
-     *
-     * Returns a list of supported comics. Each key is a comic "alias" used by
-     * the comic source, pointing to a Comic intance.
-     *
-     * @return array<non-empty-string, Comic>
-     */
-    public static function getSupported()
-    {
-        static::initSupported();
-        return static::$supported;
-    }
-
-    /**
-     * Initialize the {@link $supported} list
-     *
-     * @return void
-     */
-    protected static function initSupported()
-    {
-        if (! empty(static::$supported)) {
-            return;
-        }
-
-        foreach (static::$comicClasses as $class) {
-            $comic = $class::provides();
-            static::$supported[$class] = $comic;
-            static::$aliasMap[$comic->name] = $class;
-        }
+        $this->aliasMap = $aliasMap;
+        $this->supported = $supported;
     }
 }

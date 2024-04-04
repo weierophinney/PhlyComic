@@ -6,12 +6,17 @@
 
 namespace PhlyComic\Console;
 
+use Http\Discovery\Psr18ClientDiscovery;
 use PhlyComic\Comic;
 use PhlyComic\ComicFactory;
+use Psr\Http\Client\ClientInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 trait ComicConsoleTrait
 {
+    private ?ClientInterface $client = null;
+    private ?ComicFactory $factory = null;
+
     /**
      * Template used for comics
      *
@@ -58,18 +63,18 @@ trait ComicConsoleTrait
      */
     private function fetchComic(string $name, SymfonyStyle $console) : ?Comic
     {
-        $source  = ComicFactory::factory($name);
+        $source  = $this->getFactory()->get($name);
         $console->text(sprintf('<info>Fetching "%s"</>', $name));
         $console->progressStart();
 
-        $comic = $source->fetch();
+        $comic = $source->fetch($this->getHttpClient());
 
         $console->progressFinish();
 
-        if (! $comic instanceof Comic) {
+        if ($comic->hasError()) {
             $this->status = 1;
-            $this->reportError($console, $source->getError());
-            return false;
+            $this->reportError($console, $comic->error);
+            return null;
         }
 
         return $comic;
@@ -77,8 +82,7 @@ trait ComicConsoleTrait
 
     private function validateComicAlias(SymfonyStyle $console, string $alias) : bool
     {
-        $comics = ComicFactory::getSupported();
-        if (in_array($alias, array_keys($comics), true)) {
+        if ($this->getFactory()->has($alias)) {
             return true;
         }
 
@@ -99,5 +103,23 @@ trait ComicConsoleTrait
         }
 
         return true;
+    }
+
+    private function getFactory(): ComicFactory
+    {
+        if (null === $this->factory) {
+            $this->factory = new ComicFactory();
+        }
+
+        return $this->factory;
+    }
+
+    private function getHttpClient(): ClientInterface
+    {
+        if (null === $this->client) {
+            $this->client = Psr18ClientDiscovery::find();
+        }
+
+        return $this->client;
     }
 }

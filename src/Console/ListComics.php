@@ -30,12 +30,12 @@ class ListComics extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('Supported comics');
 
-        $comics = ComicFactory::getSupported();
+        $comics = (new ComicFactory())->getSupported();
         ksort($comics);
 
         $table = [];
-        foreach ($comics as $alias => $info) {
-            $table[] = [$alias, $info['name']];
+        foreach ($comics as $comic) {
+            $table[] = [$comic->name, $comic->title];
         }
 
         $io->table(
