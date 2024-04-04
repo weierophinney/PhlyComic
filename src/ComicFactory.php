@@ -7,10 +7,11 @@ use InvalidArgumentException;
 
 abstract class ComicFactory
 {
-    /**
-     * @var array List of comic source classes
-     */
-    protected static $comicClasses = array(
+    /** @var array<non-empty-string, class-string<ComicSource>> */
+    protected static $aliasMap = [];
+
+    /** @var list<class-string<ComicSource>> List of comic source classes */
+    protected static $comicClasses = [
         'PhlyComic\ComicSource\BasicInstructions',
         'PhlyComic\ComicSource\CommitStrip',
         'PhlyComic\ComicSource\CtrlAltDel',
@@ -34,32 +35,29 @@ abstract class ComicFactory
         'PhlyComic\ComicSource\ScenesFromAMultiverse',
         'PhlyComic\ComicSource\UserFriendly',
         'PhlyComic\ComicSource\Xkcd',
-    );
+    ];
 
-    /**
-     * @var array List of comic => array( 'name' => name, 'class' => source class)
-     */
-    protected static $supported = array();
+    /** @var array<class-string, Comic> */
+    protected static $supported = [];
 
     /**
      * Retrieve a source class for a given comic
      *
      * @param  string $name Comic "alias" used within a comic source
-     * @return ComicSource
      */
-    public static function factory($name)
+    public static function factory(string $name): ComicSource
     {
         static::initSupported();
 
-        if (!isset(static::$supported[$name])) {
+        if (! array_key_exists($name, static::$aliasMap)) {
             throw new InvalidArgumentException(sprintf(
                 'Comic "%s" is not supported',
                 $name
             ));
         }
 
-        $class  = static::$supported[$name]['class'];
-        $source = new $class($name);
+        $class  = static::$aliasMap[$name];
+        $source = new $class();
 
         if (!$source instanceof ComicSource) {
             throw new DomainException(sprintf(
@@ -77,24 +75,21 @@ abstract class ComicFactory
      *
      * Must implement ComicSource.
      *
-     * @param  string $classname
-     * @return void
+     * @param  class-string<ComicSource> $classname
      */
-    public static function addSourceClass($classname)
+    public static function addSourceClass($classname): void
     {
         static::$comicClasses[] = $classname;
-        static::$supported = array();
+        static::$supported = [];
     }
 
     /**
      * Get list of supported comics
      *
      * Returns a list of supported comics. Each key is a comic "alias" used by
-     * the comic source, pointing to an array with "name" and "class" keys; the
-     * "name" is the comic name, and the "class" is the comic source class used
-     * to retrieve it.
+     * the comic source, pointing to a Comic intance.
      *
-     * @return array
+     * @return array<non-empty-string, Comic>
      */
     public static function getSupported()
     {
@@ -109,18 +104,14 @@ abstract class ComicFactory
      */
     protected static function initSupported()
     {
-        if (!empty(static::$supported)) {
+        if (! empty(static::$supported)) {
             return;
         }
 
         foreach (static::$comicClasses as $class) {
-            $supported = call_user_func($class . '::supports');
-            foreach ($supported as $alias => $comic) {
-                static::$supported[$alias] = array(
-                    'name'  => $comic,
-                    'class' => $class,
-                );
-            }
+            $comic = $class::provides();
+            static::$supported[$class] = $comic;
+            static::$aliasMap[$comic->name] = $class;
         }
     }
 }
