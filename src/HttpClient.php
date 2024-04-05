@@ -20,7 +20,12 @@ final class HttpClient implements ClientInterface, RequestFactoryInterface
 
     public function createRequest(string $method, $uri): RequestInterface
     {
-        return $this->requestFactory->createRequest($method, $uri);
+        return $this->requestFactory
+            ->createRequest($method, $uri)
+            ->withHeader(
+                'User-Agent',
+                'Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1'
+            );
     }
 
     public function sendRequest(RequestInterface $request): ResponseInterface

@@ -4,7 +4,6 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 use PhlyComic\HttpClient;
-use Psr\Http\Message\ResponseInterface;
 use SimpleXMLElement;
 
 use function simplexml_load_string;
@@ -41,8 +40,8 @@ abstract class AbstractRssSource extends AbstractComicSource
         $this->content = null;
 
         // Retrieve feed to parse
-        $response = $this->fetchFeed($client, $this->feedUrl);
-        if (! $response->getStatusCode() === 200) {
+        $response = $client->sendRequest($client->createRequest('GET', $this->feedUrl));
+        if ($response->getStatusCode() > 299) {
             return $comic->withError('Unable to fetch feed');
         }
         $rawFeed = (string) $response->getBody();
@@ -52,7 +51,7 @@ abstract class AbstractRssSource extends AbstractComicSource
             return $sxl;
         }
 
-        return $this->getDataFromFeed($sxl);
+        return $this->getDataFromFeed($sxl, $client);
     }
 
     protected function getContent(SimpleXMLElement $item): string
@@ -76,7 +75,7 @@ abstract class AbstractRssSource extends AbstractComicSource
         if ($feed === false) {
             return $this->registerError(sprintf(
                 '%s feed cannot be parsed',
-                static::$comics[$this->comicShortName],
+                static::provides()->name,
                 $this->content
             ));
         }
@@ -84,7 +83,7 @@ abstract class AbstractRssSource extends AbstractComicSource
         return $feed;
     }
 
-    protected function getDataFromFeed(SimpleXMLElement $feed): Comic
+    protected function getDataFromFeed(SimpleXMLElement $feed, HttpClient $client): Comic
     {
         foreach ($feed->channel->item as $latest) {
             if (! $this->isOfInterest($latest)) {
@@ -126,14 +125,6 @@ abstract class AbstractRssSource extends AbstractComicSource
         }
 
         return static::provides()->withError("Unable to find img tag: $content");
-    }
-
-    protected function fetchFeed(HttpClient $client, string $url): ResponseInterface
-    {
-        $request = $client
-            ->createRequest('GET', $url)
-            ->withHeader('User-Agent', 'Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1');
-        return $client->sendRequest($request);
     }
 
     protected function isOfInterest(SimpleXMLElement|string $item): bool
