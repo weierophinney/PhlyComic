@@ -72,9 +72,9 @@ class FetchComic extends Command
         $io->progressStart();
 
         if ($comic->hasError()) {
-            $html = sprintf($this->errorTemplate . "\n", $comic->getLink(), $comic->getName(), $comic->getError());
+            $html = sprintf($this->errorTemplate . "\n", $comic->url, $comic->title, $comic->error);
         } else {
-            $html = sprintf($this->comicTemplate . "\n", $comic->getLink(), $comic->getName(), $comic->getDaily(), $comic->getImage());
+            $html = sprintf($this->comicTemplate . "\n", $comic->url, $comic->title, $comic->instanceUrl, $comic->instanceImageUrl);
         }
 
         $path = $input->getOption('output') ?: sprintf('data/comics/%s.html', $name);

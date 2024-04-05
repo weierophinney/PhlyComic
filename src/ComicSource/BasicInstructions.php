@@ -2,13 +2,18 @@
 
 namespace PhlyComic\ComicSource;
 
+use PhlyComic\Comic;
+
 class BasicInstructions extends AbstractRssSource
 {
-    protected static $comics = array(
-        'basicinstructions' => 'Basic Instructions',
-    );
+    protected $feedUrl = 'https://www.basicinstructions.net/basic-instructions?format=rss';
 
-    protected $comicBase      = 'http://basicinstructions.net/basic-instructions/';
-    protected $comicShortName = 'basicinstructions';
-    protected $feedUrl        = 'http://basicinstructions.net/basic-instructions/rss.xml';
+    public static function provides(): Comic
+    {
+        return Comic::createBaseComic(
+            'basicinstructions',
+            'Basic Instructions',
+            'http://basicinstructions.net/basic-instructions/'
+        );
+    }
 }
