@@ -89,7 +89,6 @@ abstract class AbstractDomSource extends AbstractComicSource
         }
 
         $imgUrl = false;
-        printf("Found %d results\n", $results->length);
         foreach ($results as $node) {
             if (! $node->hasAttribute($this->domAttribute)) {
                 continue;
@@ -98,7 +97,6 @@ abstract class AbstractDomSource extends AbstractComicSource
             $src = $node->getAttribute($this->domAttribute);
 
             if ($this->validateImageSrc($src)) {
-                printf("Using node: %s\n", $node->textContent);
                 $imgUrl = $this->formatImageSrc($src);
                 break;
             }

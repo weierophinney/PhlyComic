@@ -8,6 +8,20 @@ use RuntimeException;
 
 final class ComicFactory implements ContainerInterface
 {
+    public function __construct()
+    {
+        $aliasMap  = [];
+        $supported = [];
+        foreach (self::COMIC_SOURCES as $class) {
+            $comic                  = $class::provides();
+            $aliasMap[$comic->name] = $class;
+            $supported[$class]      = $comic;
+        }
+
+        $this->aliasMap = $aliasMap;
+        $this->supported = $supported;
+    }
+
     public function has(string $name): bool
     {
         return array_key_exists($name, $this->aliasMap);
@@ -36,27 +50,33 @@ final class ComicFactory implements ContainerInterface
     /** @var list<class-string<ComicSource>> List of comic source classes */
     private const COMIC_SOURCES = [
         'PhlyComic\ComicSource\BasicInstructions',
+        'PhlyComic\ComicSource\BloomCounty',
+        'PhlyComic\ComicSource\CalvinAndHobbes',
+        'PhlyComic\ComicSource\CloseToHome',
         'PhlyComic\ComicSource\CommitStrip',
         'PhlyComic\ComicSource\CtrlAltDel',
-        'PhlyComic\ComicSource\Dilbert',
+        'PhlyComic\ComicSource\CulDeSac',
         'PhlyComic\ComicSource\DorkTower',
         'PhlyComic\ComicSource\Drive',
+        'PhlyComic\ComicSource\FMinus',
         'PhlyComic\ComicSource\ForBetterOrForWorse',
         'PhlyComic\ComicSource\FoxTrot',
         'PhlyComic\ComicSource\GarfieldMinusGarfield',
-        'PhlyComic\ComicSource\GoComics',
+        'PhlyComic\ComicSource\Goats',
         'PhlyComic\ComicSource\LakeGary',
         'PhlyComic\ComicSource\ListenToMe',
         'PhlyComic\ComicSource\LunarBaboon',
+        'PhlyComic\ComicSource\NonSequitur',
         'PhlyComic\ComicSource\NotInventedHere',
         'PhlyComic\ComicSource\Oatmeal',
+        'PhlyComic\ComicSource\Peanuts',
         'PhlyComic\ComicSource\PennyArcade',
         'PhlyComic\ComicSource\PhDComics',
+        'PhlyComic\ComicSource\Pickles',
         'PhlyComic\ComicSource\ReptilisRex',
         'PhlyComic\ComicSource\SaturdayMorningBreakfastCereal',
-        'PhlyComic\ComicSource\Sheldon',
         'PhlyComic\ComicSource\ScenesFromAMultiverse',
-        'PhlyComic\ComicSource\UserFriendly',
+        'PhlyComic\ComicSource\Sheldon',
         'PhlyComic\ComicSource\Xkcd',
     ];
 
@@ -65,18 +85,4 @@ final class ComicFactory implements ContainerInterface
 
     /** @var array<class-string, Comic> */
     private readonly array $supported;
-
-    private function __construct()
-    {
-        $aliasMap  = [];
-        $supported = [];
-        foreach (self::COMIC_SOURCES as $class) {
-            $comic                  = $class::provides();
-            $aliasMap[$comic->name] = $class;
-            $supported[$class]      = $comic;
-        }
-
-        $this->aliasMap = $aliasMap;
-        $this->supported = $supported;
-    }
 }
