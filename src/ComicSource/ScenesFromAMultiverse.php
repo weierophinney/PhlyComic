@@ -4,22 +4,32 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 use DOMDocument;
+use DOMElement;
 use DOMXPath;
-use SimpleXMLElement;
+use PhlyComic\HttpClient;
 
 class ScenesFromAMultiverse extends AbstractComicSource
 {
-    protected static $comics = array(
-        'sfam' => 'Scenes From A Multiverse',
-    );
-
-    protected $comicBase = 'http://amultiverse.com';
     protected $feedUrl   = 'http://feeds.feedburner.com/ScenesFromAMultiverse';
 
-    public function fetch()
+    public static function provides(): Comic
     {
-        // will need to parse feed at http://xkcd.com/rss.xml
-        $sxl = new SimpleXMLElement($this->feedUrl, LIBXML_NOCDATA, true);
+        return Comic::createBaseComic(
+            'sfam',
+            'Scenes From A Multiverse',
+            'http://amultiverse.com/',
+        );
+    }
+
+    public function fetch(HttpClient $client): Comic
+    {
+        $response = $client->sendRequest($client->createRequest('GET', $this->feedUrl));
+        if ($response->getStatusCode() > 299) {
+            return $this->registerError(sprintf('Unable to fetch feed %s', $this->feedUrl));
+        }
+
+        $feed = $response->getBody()->__toString();
+        $sxl  = simplexml_load_string($feed, options: LIBXML_NOCDATA);
 
         // Iterate <item> elements, breaking after first
         $latest = $sxl->channel->item[0];
@@ -40,9 +50,11 @@ class ScenesFromAMultiverse extends AbstractComicSource
                 $desc
             ));
         }
+
+        /** @var DOMElement $img */
         $img = $result->item(0);
 
-        if (!$img->hasAttribute('src')) {
+        if (! $img->hasAttribute('src')) {
             return $this->registerError(sprintf(
                 'Scenes From A Multiverse image does not contain a src attribute: %s',
                 $desc
@@ -50,23 +62,6 @@ class ScenesFromAMultiverse extends AbstractComicSource
         }
         $image = $img->getAttribute('src');
 
-        $comic = new Comic(
-            /* 'name'  => */ static::$comics['sfam'],
-            /* 'link'  => */ $this->comicBase,
-            /* 'daily' => */ $daily,
-            /* 'image' => */ $image
-        );
-
-        return $comic;
-    }
-
-    protected function registerError($message)
-    {
-        $comic = new Comic(
-            /* 'name'  => */ static::$comics['sfam'],
-            /* 'link'  => */ $this->comicBase
-        );
-        $comic->setError($message);
-        return $comic;
+        return self::provides()->withInstance($daily, $image);
     }
 }
