@@ -1,31 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
+use PhlyComic\HttpClient;
 use PhpCss;
+
+use function count;
+use function file_get_contents;
 
 class Sheldon extends AbstractComicSource
 {
     use XPathTrait;
 
-    private const BASE_URL = 'http://www.sheldoncomics.com/';
-    private const SELECTOR_NEXT = 'a#sidenav-next';
-    private const SELECTOR_PREV = 'a#sidenav-prev';
-    private const SELECTOR_COMIC = 'div#comic img';
+    private const SELECTOR_NEXT  = 'a#sidenav-next';
+    private const SELECTOR_PREV  = 'a#sidenav-prev';
+    private const SELECTOR_COMIC = '#spliced-comic span img';
 
-    protected static $comics = array(
-        'sheldon' => 'Sheldon',
-    );
-
-    public function fetch()
+    public static function provides(): Comic
     {
-        $page = file_get_contents(self::BASE_URL);
-        if ($page === false) {
+        return Comic::createBaseComic(
+            'sheldon',
+            'Sheldon',
+            'https://www.sheldoncomics.com/',
+        );
+    }
+
+    public function fetch(HttpClient $client): Comic
+    {
+        $comic    = self::provides();
+        $response = $client->sendRequest($client->createRequest('GET', $comic->url));
+        if ($response->getStatusCode() > 299) {
             return $this->registerError('Unable to reach Sheldon comic');
         }
 
-        $imgUrl = $this->getUrlFromPageNode($page, self::SELECTOR_COMIC, 'src');
+        $page   = $response->getBody()->__toString();
+        $imgUrl = $this->getUrlFromPageNode($page, self::SELECTOR_COMIC, 'data-src-img');
         if ($imgUrl === null) {
             return $this->registerError('Unable to locate Sheldon comic image');
         }
@@ -33,33 +45,13 @@ class Sheldon extends AbstractComicSource
         $comicUrl = $this->getComicUrl($page);
 
         return null === $comicUrl
-            ? new Comic(
-                static::$comics['sheldon'],
-                self::BASE_URL,
-                self::BASE_URL,
-                $imgUrl,
-            )
-            : new Comic(
-                static::$comics['sheldon'],
-                self::BASE_URL,
-                $comicUrl,
-                $imgUrl,
-            );
-    }
-
-    protected function registerError($message)
-    {
-        $comic = new Comic(
-            static::$comics['sheldon'],
-            self:: BASE_URL,
-        );
-        $comic->setError($message);
-        return $comic;
+            ? $comic->withInstance($comic->url, $imgUrl)
+            : $comic->withInstance($comicUrl, $imgUrl);
     }
 
     private function getUrlFromPageNode(string $content, string $selector, string $attribute = 'href'): ?string
     {
-        $xpath = $this->getXPathForDocument($content);
+        $xpath   = $this->getXPathForDocument($content);
         $results = $xpath->query(PhpCss::toXpath($selector));
         if (false === $results || 0 === count($results)) {
             return null;

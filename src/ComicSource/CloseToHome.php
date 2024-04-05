@@ -6,16 +6,14 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 
-class LakeGary extends AbstractRssSource
+class CloseToHome extends GoComics
 {
-    protected string $feedUrl = 'http://lakegary.com/rss';
-
     public static function provides(): Comic
     {
         return Comic::createBaseComic(
-            'lakegary',
-            'Lake Gary',
-            'http://lakegary.com/',
+            'closetohome',
+            'Close to Home',
+            'https://www.gocomics.com/closetohome'
         );
     }
 }

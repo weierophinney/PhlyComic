@@ -1,51 +1,44 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
 
 use DateTimeImmutable;
 use DateTimeInterface;
 use PhlyComic\Comic;
+use PhlyComic\HttpClient;
 use SimpleXMLElement;
+
+use function array_shift;
+use function fwrite;
+use function sprintf;
+use function usort;
+
+use const STDERR;
 
 abstract class AbstractDateOrderedRssSource extends AbstractRssSource
 {
-    public function fetch()
+    public function fetch(HttpClient $client): Comic
     {
         $this->content = null;
 
         // Retrieve feed to parse
-        $rawFeed = $this->fetchFeed($this->feedUrl);
+        $response = $client->sendRequest($client->createRequest('GET', $this->feedUrl));
+        if ($response->getStatusCode() > 299) {
+            return static::provides()->withError('Unable to fetch feed at ' . $this->feedUrl);
+        }
 
-        $sxl = $this->getXmlElement($rawFeed);
+        $rawFeed = $response->getBody()->__toString();
+        $sxl     = $this->getXmlElement($rawFeed);
         if ($sxl instanceof Comic) {
             return $sxl;
         }
 
-        $data = $this->getDataFromFeed($sxl);
-
-        if ($data instanceof Comic) {
-            return $data;
-        }
-
-        if (! $data) {
-            return $this->registerError(sprintf(
-                '%s feed does not include image description containing image URL: %s',
-                static::$comics[$this->comicShortName],
-                $this->content
-            ));
-        }
-
-        $comic = new Comic(
-            /* 'name'  => */ static::$comics[$this->comicShortName],
-            /* 'link'  => */ $this->comicBase,
-            /* 'daily' => */ $data['daily'],
-            /* 'image' => */ $data['image']
-        );
-
-        return $comic;
+        return $this->getDataFromFeed($sxl, $client);
     }
 
-    protected function getDataFromFeed(SimpleXMLElement $feed)
+    protected function getDataFromFeed(SimpleXMLElement $feed, HttpClient $client): Comic
     {
         $items = [];
         foreach ($feed->item as $item) {
@@ -77,18 +70,19 @@ abstract class AbstractDateOrderedRssSource extends AbstractRssSource
         }
 
         if ($items === []) {
-            fwrite(STDERR, "No items with images found!\n");
-            return false;
+            return $this->registerError(sprintf(
+                '%s feed does not include image description containing image URL: %s',
+                static::provides()->name,
+                $this->content
+            ));
         }
 
         usort($items, fn (array $a, array $b): int => $b['date'] <=> $a['date']);
 
-        $item = array_shift($items);
+        $item          = array_shift($items);
         $this->content = $item['content'];
-        return [
-            'daily' => $item['daily'],
-            'image' => $item['image'],
-        ];
+
+        return static::provides()->withInstance($item['daily'], $item['image']);
     }
 
     protected function getItemDate(SimpleXMLElement $item): ?DateTimeInterface

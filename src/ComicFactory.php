@@ -1,126 +1,121 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic;
 
-use DomainException;
-use InvalidArgumentException;
+use PhlyComic\ComicSource\BasicInstructions;
+use PhlyComic\ComicSource\BloomCounty;
+use PhlyComic\ComicSource\CalvinAndHobbes;
+use PhlyComic\ComicSource\CloseToHome;
+use PhlyComic\ComicSource\CommitStrip;
+use PhlyComic\ComicSource\CtrlAltDel;
+use PhlyComic\ComicSource\CulDeSac;
+use PhlyComic\ComicSource\DorkTower;
+use PhlyComic\ComicSource\Drive;
+use PhlyComic\ComicSource\FMinus;
+use PhlyComic\ComicSource\ForBetterOrForWorse;
+use PhlyComic\ComicSource\FoxTrot;
+use PhlyComic\ComicSource\GarfieldMinusGarfield;
+use PhlyComic\ComicSource\Goats;
+use PhlyComic\ComicSource\LakeGary;
+use PhlyComic\ComicSource\ListenToMe;
+use PhlyComic\ComicSource\LunarBaboon;
+use PhlyComic\ComicSource\NonSequitur;
+use PhlyComic\ComicSource\NotInventedHere;
+use PhlyComic\ComicSource\Oatmeal;
+use PhlyComic\ComicSource\Peanuts;
+use PhlyComic\ComicSource\PennyArcade;
+use PhlyComic\ComicSource\PhDComics;
+use PhlyComic\ComicSource\Pickles;
+use PhlyComic\ComicSource\ReptilisRex;
+use PhlyComic\ComicSource\SaturdayMorningBreakfastCereal;
+use PhlyComic\ComicSource\ScenesFromAMultiverse;
+use PhlyComic\ComicSource\Sheldon;
+use PhlyComic\ComicSource\Xkcd;
+use Psr\Container\ContainerExceptionInterface;
+use Psr\Container\ContainerInterface;
+use RuntimeException;
 
-abstract class ComicFactory
+use function array_key_exists;
+
+final class ComicFactory implements ContainerInterface
 {
-    /**
-     * @var array List of comic source classes
-     */
-    protected static $comicClasses = array(
-        'PhlyComic\ComicSource\BasicInstructions',
-        'PhlyComic\ComicSource\CommitStrip',
-        'PhlyComic\ComicSource\CtrlAltDel',
-        'PhlyComic\ComicSource\Dilbert',
-        'PhlyComic\ComicSource\DorkTower',
-        'PhlyComic\ComicSource\Drive',
-        'PhlyComic\ComicSource\ForBetterOrForWorse',
-        'PhlyComic\ComicSource\FoxTrot',
-        'PhlyComic\ComicSource\GarfieldMinusGarfield',
-        'PhlyComic\ComicSource\GoComics',
-        'PhlyComic\ComicSource\LakeGary',
-        'PhlyComic\ComicSource\ListenToMe',
-        'PhlyComic\ComicSource\LunarBaboon',
-        'PhlyComic\ComicSource\NotInventedHere',
-        'PhlyComic\ComicSource\Oatmeal',
-        'PhlyComic\ComicSource\PennyArcade',
-        'PhlyComic\ComicSource\PhDComics',
-        'PhlyComic\ComicSource\ReptilisRex',
-        'PhlyComic\ComicSource\SaturdayMorningBreakfastCereal',
-        'PhlyComic\ComicSource\Sheldon',
-        'PhlyComic\ComicSource\ScenesFromAMultiverse',
-        'PhlyComic\ComicSource\UserFriendly',
-        'PhlyComic\ComicSource\Xkcd',
-    );
-
-    /**
-     * @var array List of comic => array( 'name' => name, 'class' => source class)
-     */
-    protected static $supported = array();
-
-    /**
-     * Retrieve a source class for a given comic
-     *
-     * @param  string $name Comic "alias" used within a comic source
-     * @return ComicSource
-     */
-    public static function factory($name)
+    public function __construct()
     {
-        static::initSupported();
-
-        if (!isset(static::$supported[$name])) {
-            throw new InvalidArgumentException(sprintf(
-                'Comic "%s" is not supported',
-                $name
-            ));
+        $aliasMap  = [];
+        $supported = [];
+        foreach (self::COMIC_SOURCES as $class) {
+            $comic                  = $class::provides();
+            $aliasMap[$comic->name] = $class;
+            $supported[$class]      = $comic;
         }
 
-        $class  = static::$supported[$name]['class'];
-        $source = new $class($name);
+        $this->aliasMap  = $aliasMap;
+        $this->supported = $supported;
+    }
 
-        if (!$source instanceof ComicSource) {
-            throw new DomainException(sprintf(
-                'Comic "%s" does not have a valid ComicSource (uses "%s") associated with it',
-                $name,
-                $class
-            ));
+    public function has(string $name): bool
+    {
+        return array_key_exists($name, $this->aliasMap);
+    }
+
+    public function get(string $name): ComicSource
+    {
+        if (! array_key_exists($name, $this->aliasMap)) {
+            throw new class ($name) extends RuntimeException implements ContainerExceptionInterface {
+                public function __construct(string $name)
+                {
+                    parent::__construct("Comic source by name '$name' does not exist");
+                }
+            };
         }
 
-        return $source;
+        $class = $this->aliasMap[$name];
+        return new $class();
     }
 
-    /**
-     * Add a comic source class to use with the factory
-     *
-     * Must implement ComicSource.
-     *
-     * @param  string $classname
-     * @return void
-     */
-    public static function addSourceClass($classname)
+    public function getSupported(): array
     {
-        static::$comicClasses[] = $classname;
-        static::$supported = array();
+        return $this->supported;
     }
 
-    /**
-     * Get list of supported comics
-     *
-     * Returns a list of supported comics. Each key is a comic "alias" used by
-     * the comic source, pointing to an array with "name" and "class" keys; the
-     * "name" is the comic name, and the "class" is the comic source class used
-     * to retrieve it.
-     *
-     * @return array
-     */
-    public static function getSupported()
-    {
-        static::initSupported();
-        return static::$supported;
-    }
+    /** @var list<class-string<ComicSource>> List of comic source classes */
+    private const COMIC_SOURCES = [
+        BasicInstructions::class,
+        BloomCounty::class,
+        CalvinAndHobbes::class,
+        CloseToHome::class,
+        CommitStrip::class,
+        CtrlAltDel::class,
+        CulDeSac::class,
+        DorkTower::class,
+        Drive::class,
+        FMinus::class,
+        ForBetterOrForWorse::class,
+        FoxTrot::class,
+        GarfieldMinusGarfield::class,
+        Goats::class,
+        LakeGary::class,
+        ListenToMe::class,
+        LunarBaboon::class,
+        NonSequitur::class,
+        NotInventedHere::class,
+        Oatmeal::class,
+        Peanuts::class,
+        PennyArcade::class,
+        PhDComics::class,
+        Pickles::class,
+        ReptilisRex::class,
+        SaturdayMorningBreakfastCereal::class,
+        ScenesFromAMultiverse::class,
+        Sheldon::class,
+        Xkcd::class,
+    ];
 
-    /**
-     * Initialize the {@link $supported} list
-     *
-     * @return void
-     */
-    protected static function initSupported()
-    {
-        if (!empty(static::$supported)) {
-            return;
-        }
+    /** @var array<non-empty-string, class-string> */
+    private readonly array $aliasMap;
 
-        foreach (static::$comicClasses as $class) {
-            $supported = call_user_func($class . '::supports');
-            foreach ($supported as $alias => $comic) {
-                static::$supported[$alias] = array(
-                    'name'  => $comic,
-                    'class' => $class,
-                );
-            }
-        }
-    }
+    /** @var array<class-string, Comic> */
+    private readonly array $supported;
 }

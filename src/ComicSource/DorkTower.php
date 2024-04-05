@@ -1,18 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
+
+use PhlyComic\Comic;
+
+use function preg_match;
 
 class DorkTower extends AbstractRssSource
 {
-    protected static $comics = array(
-        'dorktower' => 'Dork Tower',
-    );
+    protected string $feedUrl            = 'http://www.dorktower.com/feed/';
+    protected false|string $tagNamespace = 'content';
+    protected string $tagWithImage       = 'encoded';
 
-    protected $comicBase      = 'http://www.dorktower.com';
-    protected $comicShortName = 'dorktower';
-    protected $feedUrl        = 'http://www.dorktower.com/feed/';
-    protected $tagNamespace   = 'http://purl.org/rss/1.0/modules/content/';
-    protected $tagWithImage   = 'encoded';
+    public static function provides(): Comic
+    {
+        return Comic::createBaseComic(
+            'dorktower',
+            'Dork Tower',
+            'https://www.dorktower.com/',
+        );
+    }
 
     /**
      * Override image capturing from content.
@@ -23,12 +32,17 @@ class DorkTower extends AbstractRssSource
      * @param string $content Feed item content
      * @return false|string
      */
-    protected function getImageFromContent($content)
+    protected function getImageFromContent($content): string|Comic
     {
         $image = parent::getImageFromContent($content);
-        if (! preg_match('#/\d{4}/\d{2}/dorkTower\d+\.(?:jpg|jpeg|png|gif)$#i', $image)) {
-            return false;
+        if ($image instanceof Comic) {
+            return $image;
         }
+
+        if (! preg_match('#/\d{4}/\d{2}/dorktower[^.]+\.(?:jpg|jpeg|png|gif)$#i', $image)) {
+            return self::provides()->withError("Could not find image tag with supported image type (found $image)");
+        }
+
         return $image;
     }
 }

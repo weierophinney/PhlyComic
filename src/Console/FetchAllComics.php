@@ -1,14 +1,10 @@
 <?php
 
-/**
- * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) Matthew Weier O'Phinney
- */
+declare(strict_types=1);
 
 namespace PhlyComic\Console;
 
 use PhlyComic\Comic;
-use PhlyComic\ComicFactory;
 use RuntimeException;
 use Spatie\Async\Pool;
 use Symfony\Component\Console\Command\Command;
@@ -18,11 +14,26 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
+use function array_filter;
+use function ctype_digit;
+use function file_exists;
+use function file_put_contents;
+use function getcwd;
+use function implode;
+use function in_array;
+use function is_int;
+use function is_string;
+use function ksort;
+use function realpath;
+use function sprintf;
+
+use const SORT_NATURAL;
+
 class FetchAllComics extends Command
 {
     use ComicConsoleTrait;
 
-    private $processes = 0;
+    private int $processes = 0;
 
     protected function configure()
     {
@@ -62,7 +73,7 @@ class FetchAllComics extends Command
 
     public function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $io = new SymfonyStyle($input, $output);
+        $io           = new SymfonyStyle($input, $output);
         $this->status = 0;
 
         $outputPath = $input->getOption('output');
@@ -104,13 +115,11 @@ class FetchAllComics extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('Fetching comics');
 
-        $supported = ComicFactory::getSupported();
-        ksort($supported);
-        $supported = array_keys($supported);
+        $supported = $this->getFactory()->getSupported();
 
         $exclude = $input->getOption('exclude');
-        $toFetch = array_filter($supported, function ($comic) use ($exclude) {
-            return ! in_array($comic, $exclude);
+        $toFetch = array_filter($supported, function (Comic $comic) use ($exclude) {
+            return ! in_array($comic->name, $exclude);
         });
 
         $html = $this->processes > 0
@@ -127,9 +136,9 @@ class FetchAllComics extends Command
 
     private function fetchSync(array $comics, SymfonyStyle $console): string
     {
-        $html  = '';
-        foreach ($comics as $name) {
-            $comic = $this->fetchComic($name, $console);
+        $html = '';
+        foreach ($comics as $toFetch) {
+            $comic = $this->fetchComic($toFetch->name, $console);
             if (! $comic instanceof Comic) {
                 continue;
             }
@@ -147,21 +156,21 @@ class FetchAllComics extends Command
             ->sleepTime(50000);
 
         $content = (object) ['comics' => []];
-        foreach ($comics as $name) {
-            $console->text(sprintf('<info>Queuing retrieval of "%s"</info>', $name));
+        foreach ($comics as $toFetch) {
+            $console->text(sprintf('<info>Queuing retrieval of "%s"</info>', $toFetch->name));
             $pool
-                ->add(function () use ($name) {
+                ->add(function () use ($toFetch) {
                     $result = (object) [
                         'status' => null,
                         'comic'  => null,
                         'error'  => null,
                     ];
-                    $source = ComicFactory::factory($name);
-                    $comic  = $source->fetch();
+                    $source = $this->getFactory()->get($toFetch->name);
+                    $comic  = $source->fetch($this->getHttpClient());
 
-                    if (! $comic instanceof Comic) {
+                    if ($comic->hasError()) {
                         $result->status = 1;
-                        $result->error  = $source->getError();
+                        $result->error  = $comic->error;
                         return $result;
                     }
 
@@ -169,11 +178,11 @@ class FetchAllComics extends Command
                     $result->comic  = $comic;
                     return $result;
                 })
-                ->then(function ($result) use ($name, $console, $content) {
+                ->then(function ($result) use ($toFetch, $console, $content) {
                     if ($result->status !== 0) {
                         $this->reportError($console, sprintf(
                             'Error fetching %s: %s',
-                            $name,
+                            $toFetch->name,
                             $result->error
                         ));
                         return;
@@ -183,13 +192,13 @@ class FetchAllComics extends Command
                         return;
                     }
 
-                    $console->text(sprintf('<info>Completed retrieval of "%s</info>', $name));
-                    $content->comics[$name] = $this->createComicOutput($result->comic);
+                    $console->text(sprintf('<info>Completed retrieval of "%s</info>', $toFetch->name));
+                    $content->comics[$toFetch->name] = $this->createComicOutput($result->comic);
                 })
-                ->catch(function (Throwable $e) use ($name, $console) {
+                ->catch(function (Throwable $e) use ($toFetch, $console) {
                     $this->reportError($console, sprintf(
                         'Error fetching %s: %s',
-                        $name,
+                        $toFetch->name,
                         $e->getMessage()
                     ));
                 });
@@ -205,18 +214,18 @@ class FetchAllComics extends Command
         if ($comic->hasError()) {
             return sprintf(
                 $this->errorTemplate . "\n",
-                $comic->getLink(),
-                $comic->getName(),
-                $comic->getError()
+                $comic->url,
+                $comic->title,
+                $comic->error,
             );
         }
 
         return sprintf(
             $this->comicTemplate . "\n",
-            $comic->getLink(),
-            $comic->getName(),
-            $comic->getDaily(),
-            $comic->getImage()
+            $comic->url,
+            $comic->title,
+            $comic->instanceUrl,
+            $comic->instanceImageUrl,
         );
     }
 

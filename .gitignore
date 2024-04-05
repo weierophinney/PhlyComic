@@ -1,3 +1,4 @@
+.phpcs-cache
 .vimproject
 composer.lock
 vendor/

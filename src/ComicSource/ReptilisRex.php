@@ -1,14 +1,23 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
+
+use PhlyComic\Comic;
 
 class ReptilisRex extends AbstractRssSource
 {
-    protected static $comics = array(
-        'reptilis-rex' => 'Reptilis Rex',
-    );
+    protected string $feedUrl            = 'https://reptilisrex.com/feed/';
+    protected false|string $tagNamespace = 'content';
+    protected string $tagWithImage       = 'encoded';
 
-    protected $comicBase      = 'http://www.reptilisrex.com';
-    protected $comicShortName = 'reptilis-rex';
-    protected $feedUrl        = 'http://www.reptilisrex.com/feed/';
+    public static function provides(): Comic
+    {
+        return Comic::createBaseComic(
+            'reptilis-rex',
+            'Reptilis Rex',
+            'https://www.reptilisrex.com/',
+        );
+    }
 }

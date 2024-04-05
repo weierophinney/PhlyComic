@@ -1,37 +1,54 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
 
 use DOMXPath;
 use PhlyComic\Comic;
+use PhlyComic\HttpClient;
 use PhpCss;
+
+use function preg_match;
+use function sprintf;
+use function strstr;
 
 class CommitStrip extends AbstractDomSource
 {
-    protected static $comics = array(
-        'commitstrip' => 'CommitStrip',
-    );
+    protected string $dailyFormat     = 'https://www.commitstrip.com/';
+    protected bool $domIsHtml         = true;
+    protected string $domQuery        = '.excerpt img';
+    protected string $domQueryForLink = '.excerpt a';
+    protected bool $useComicBase      = true;
 
-    protected $comicBase      = 'https://www.commitstrip.com/';
-    protected $comicShortName = 'commitstrip';
-
-    protected $dailyFormat     = 'https://www.commitstrip.com/';
-    protected $domIsHtml       = true;
-    protected $domQuery        = '.excerpt img';
-    protected $domQueryForLink = '.excerpt a';
-    protected $useComicBase    = true;
-
-    public function fetch()
+    public static function provides(): Comic
     {
-        $href = $this->fetchMostRecentComicPageHrefFromLandingPage();
-        if (! $href) {
+        return Comic::createBaseComic(
+            'commitstrip',
+            'CommitStrip',
+            'https://www.commitstrip.com/',
+        );
+    }
+
+    public function fetch(HttpClient $client): Comic
+    {
+        $href = $this->fetchMostRecentComicPageHrefFromLandingPage($client);
+        if (null === $href) {
             return $this->registerError(sprintf(
                 'Unable to find most recent comic for "%s"',
-                $this->comicShortName
+                self::provides()->name,
             ));
         }
 
-        $html  = file_get_contents($href);
+        $response = $client->sendRequest($client->createRequest('GET', $href));
+        if ($response->getStatusCode() > 299) {
+            return $this->registerError(sprintf(
+                'Unable to find most recent comic for "%s"',
+                self::provides()->name,
+            ));
+        }
+
+        $html  = $response->getBody()->__toString();
         $xpath = $this->getXPathForDocument($html);
         $found = false;
         foreach ($xpath->query(PhpCss::toXpath('.entry-content img')) as $node) {
@@ -42,7 +59,7 @@ class CommitStrip extends AbstractDomSource
         if (! $found) {
             return $this->registerError(sprintf(
                 'Unable to find most recent comic for "%s"; page has unexpected structure.',
-                $this->comicShortName
+                self::provides()->name,
             ));
         }
 
@@ -51,19 +68,14 @@ class CommitStrip extends AbstractDomSource
         if (! $image) {
             return $this->registerError(sprintf(
                 'Unable to find most recent comic for "%s"; img tag missing.',
-                $this->comicShortName
+                self::provides()->name,
             ));
         }
 
-        return new Comic(
-            static::$comics[$this->comicShortName],
-            $this->comicBase,
-            $href,
-            $image
-        );
+        return self::provides()->withInstance($href, $image);
     }
 
-    protected function validateImageSrc($src)
+    protected function validateImageSrc(string $src): bool
     {
         if (strstr($src, '//www.commitstrip.com/wp-content/uploads/')) {
             return true;
@@ -71,7 +83,7 @@ class CommitStrip extends AbstractDomSource
         return false;
     }
 
-    protected function getDailyUrl($imgUrl, DOMXPath $xpath)
+    protected function getDailyUrl(string $imgUrl, DOMXPath $xpath): string
     {
         foreach ($xpath->query(PhpCss::toXpath($this->domQueryForLink)) as $node) {
             if (! $node->hasAttribute('href')) {
@@ -85,16 +97,18 @@ class CommitStrip extends AbstractDomSource
 
             return $href;
         }
-        return $this->comicBase;
+
+        return self::provides()->url;
     }
 
-    private function fetchMostRecentComicPageHrefFromLandingPage(): ?string
+    private function fetchMostRecentComicPageHrefFromLandingPage(HttpClient $client): ?string
     {
-        $page = file_get_contents($this->comicBase);
-        if (! $page) {
+        $response = $client->sendRequest($client->createRequest('GET', self::provides()->url));
+        if ($response->getStatusCode() > 299) {
             return null;
         }
 
+        $page  = $response->getBody()->__toString();
         $xpath = $this->getXPathForDocument($page);
         foreach ($xpath->query(PhpCss::toXpath($this->domQueryForLink)) as $node) {
             if (! $node->hasAttribute('href')) {

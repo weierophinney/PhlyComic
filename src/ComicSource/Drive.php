@@ -1,20 +1,29 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
+
+use PhlyComic\Comic;
+
+use function preg_match;
 
 class Drive extends AbstractDomSource
 {
-    protected static $comics = array(
-        'drive' => 'drive',
-    );
+    protected string $domQuery   = 'div#unspliced-comic img';
+    protected bool $domIsHtml    = true;
+    protected bool $useComicBase = true;
 
-    protected $comicBase           = 'https://www.drivecomic.com';
-    protected $comicShortName      = 'drive';
-    protected $domQuery            = 'div#unspliced-comic img';
-    protected $domIsHtml           = true;
-    protected $useComicBase        = true;
+    public static function provides(): Comic
+    {
+        return Comic::createBaseComic(
+            'drive',
+            'drive',
+            'https://www.drivecomic.com/',
+        );
+    }
 
-    protected function validateImageSrc($src): bool
+    protected function validateImageSrc(string $src): bool
     {
         return (bool) preg_match('#^https?://#', $src);
     }

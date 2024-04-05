@@ -1,23 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
 
 use DOMDocument;
 use DOMXPath;
 use RuntimeException;
 
+use function libxml_get_errors;
+use function libxml_use_internal_errors;
+use function sprintf;
+use function var_export;
+
 trait XPathTrait
 {
-    protected function getXPathForDocument(string $content) : DOMXPath
+    protected function getXPathForDocument(string $content): DOMXPath
     {
         libxml_use_internal_errors(true);
-        PHP_MAJOR_VERSION < 8 && libxml_disable_entity_loader(true);
 
         $document = new DOMDocument('1.0', 'UTF-8');
-        $success = $document->loadHTML($content);
+        $success  = $document->loadHTML($content);
 
         $errors = libxml_get_errors();
-        PHP_MAJOR_VERSION < 8 && libxml_disable_entity_loader(false);
         libxml_use_internal_errors(false);
 
         if (! $success) {

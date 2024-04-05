@@ -1,59 +1,45 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
 
-use InvalidArgumentException;
 use PhlyComic\Comic;
+use PhlyComic\HttpClient;
 
-class GoComics extends AbstractDomSource
+use function sprintf;
+use function strpos;
+
+abstract class GoComics extends AbstractDomSource
 {
-    protected static $comics = array(
-        'bloom-county'    => 'Bloom County 2015',
-        'calvinandhobbes' => 'Calvin and Hobbes',
-        'closetohome'     => 'Close to Home',
-        'culdesac'        => 'Cul de Sac',
-        'fminus'          => 'F Minus',
-        'goats'           => 'Goats',
-        'nonsequitur'     => 'Non Sequitur',
-        'peanuts'         => 'Peanuts',
-        'pickles'         => 'Pickles',
-    );
+    protected string $domQuery = 'picture.item-comic-image img';
+    private string $baseUrl    = 'https://www.gocomics.com';
 
-    protected $comicFormat = 'https://www.gocomics.com/%s';
-    protected $dateFormat  = 'Y/m/d';
-    protected $domQuery    = 'picture.item-comic-image img';
-
-    private $baseUrl     = 'https://www.gocomics.com';
-
-    public function __construct($name)
+    public function fetch(HttpClient $client): Comic
     {
-        if (! isset(static::$comics[$name])) {
-            throw new InvalidArgumentException(sprintf(
-                'The comic "%s" is unsupported by this class',
-                $name
-            ));
-        }
-        $this->comicShortName = $name;
-        $this->comicBase      = sprintf($this->comicFormat, $name);
-        $this->dailyFormat    = $this->comicBase . '/%s';
-    }
-
-    public function fetch()
-    {
-        $href = $this->fetchMostRecentComicPageHrefFromLandingPage();
-        if (! $href) {
+        $href = $this->fetchMostRecentComicPageHrefFromLandingPage($client);
+        if (null === $href) {
             return $this->registerError(sprintf(
                 'Unable to find most recent comic for "%s"',
-                $this->comicShortName
+                static::provides()->name,
             ));
         }
 
-        $html = file_get_contents($href);
+        $response = $client->sendRequest($client->createRequest('GET', $href));
+        if ($response->getStatusCode() > 299) {
+            return $this->registerError(sprintf(
+                'Unable to find most recent comic for "%s"',
+                static::provides()->name,
+            ));
+        }
+
+        $html  = $response->getBody()->__toString();
         $xpath = $this->getXPathForDocument($html);
         $found = false;
 
         foreach ($xpath->document->getElementsByTagName('picture') as $node) {
-            if ($node->hasAttribute('class')
+            if (
+                $node->hasAttribute('class')
                 && false !== strpos($node->getAttribute('class'), 'item-comic-image')
             ) {
                 $found = $node;
@@ -64,7 +50,7 @@ class GoComics extends AbstractDomSource
         if (! $found) {
             return $this->registerError(sprintf(
                 'Unable to find most recent comic for "%s"; page has unexpected structure.',
-                $this->comicShortName
+                static::provides()->name,
             ));
         }
 
@@ -79,26 +65,21 @@ class GoComics extends AbstractDomSource
         if (! $image) {
             return $this->registerError(sprintf(
                 'Unable to find most recent comic for "%s"; img tag missing.',
-                $this->comicShortName
+                static::provides()->name,
             ));
         }
 
-        return new Comic(
-            /* 'name'  => */ static::$comics[$this->comicShortName],
-            /* 'link'  => */ $this->comicBase,
-            /* 'daily' => */ $href,
-            /* 'image' => */ $image
-        );
+        return static::provides()->withInstance($href, $image);
     }
 
-    private function fetchMostRecentComicPageHrefFromLandingPage() : ?string
+    private function fetchMostRecentComicPageHrefFromLandingPage(HttpClient $client): ?string
     {
-        $page = file_get_contents($this->comicBase);
-        if (! $page) {
+        $response = $client->sendRequest($client->createRequest('GET', static::provides()->url));
+        if ($response->getStatusCode() > 299) {
             return null;
         }
 
-        $comic = null;
+        $page  = $response->getBody()->__toString();
         $xpath = $this->getXPathForDocument($page);
         foreach ($xpath->document->getElementsByTagName('a') as $link) {
             if (! $link->hasAttribute('data-link')) {
@@ -111,9 +92,5 @@ class GoComics extends AbstractDomSource
         }
 
         return null;
-    }
-
-    private function fetchComicFromDiscovered() : Comic
-    {
     }
 }

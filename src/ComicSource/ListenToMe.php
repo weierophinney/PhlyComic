@@ -1,14 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
+
+use PhlyComic\Comic;
 
 class ListenToMe extends AbstractRssSource
 {
-    protected static $comics = array(
-        'listen-tome' => 'Please Listen to Me',
-    );
+    protected string $feedUrl = 'https://feeds.feedburner.com/PLTM';
 
-    protected $comicBase      = 'http://www.listen-tome.com';
-    protected $comicShortName = 'listen-tome';
-    protected $feedUrl        = 'http://feeds.feedburner.com/PLTM';
+    public static function provides(): Comic
+    {
+        return Comic::createBaseComic(
+            'listen-tome',
+            'Please Listen to Me',
+            'http://www.listen-tome.com/',
+        );
+    }
 }

@@ -1,12 +1,18 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
 
 use DOMDocument;
 use DOMXPath;
 use PhlyComic\Comic;
+use PhlyComic\HttpClient;
 use PhpCss;
 use SimpleXMLElement;
+
+use function count;
+use function sprintf;
 
 /**
  * The SMBC feed provides a link to the **page** containing the comic,
@@ -18,37 +24,42 @@ use SimpleXMLElement;
  */
 class SaturdayMorningBreakfastCereal extends AbstractRssSource
 {
-    protected static $comics = array(
-        'smbc' => 'Saturday Morning Breakfast Cereal',
-    );
+    protected string $domQuery = 'img';
+    protected string $feedUrl  = 'https://www.smbc-comics.com/comics/rss';
 
-    protected $comicBase      = 'http://www.smbc-comics.com/';
-    protected $comicShortName = 'smbc';
-    protected $domQuery       = 'img';
-    protected $feedUrl        = 'http://www.smbc-comics.com/rss.php';
-
-    protected function getDataFromFeed(SimpleXMLElement $feed)
+    public static function provides(): Comic
     {
+        return Comic::createBaseComic(
+            'smbc',
+            'Saturday Morning Breakfast Cereal',
+            'https://www.smbc-comics.com/',
+        );
+    }
+
+    protected function getDataFromFeed(SimpleXMLElement $feed, HttpClient $client): Comic
+    {
+        $comic = self::provides();
+
         foreach ($feed->channel->item as $latest) {
             $description = (string) $latest->description;
             $link        = (string) $latest->link;
             $image       = $this->getImageFromDescription($description, $link);
 
-            if ($image) {
-                return array(
-                    'daily' => $link,
-                    'image' => $image,
-                );
+            if ($image instanceof Comic) {
+                continue;
             }
+
+            return $comic->withInstance($link, $image);
         }
-        return false;
+
+        return $comic->withError('Unable to find image in feed for ' . $comic->name);
     }
 
-    protected function getImageFromDescription($description, $url)
+    protected function getImageFromDescription(string $description, string $url): string|Comic
     {
         $document = new DOMDocument('1.0', 'UTF-8');
         $document->loadHTML($description);
-        $xpath = new DOMXPath($document);
+        $xpath   = new DOMXPath($document);
         $results = $xpath->query(PhpCss::toXpath($this->domQuery));
 
         if (false === $results || ! count($results)) {

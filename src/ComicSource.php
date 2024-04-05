@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic;
 
 /**
@@ -7,7 +9,7 @@ namespace PhlyComic;
  */
 interface ComicSource
 {
-    public static function supports();
-    public function fetch();
-    public function getError();
+    public static function provides(): Comic;
+
+    public function fetch(HttpClient $client): Comic;
 }

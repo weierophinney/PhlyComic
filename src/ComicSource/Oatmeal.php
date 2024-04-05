@@ -1,15 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
+
+use PhlyComic\Comic;
 
 class Oatmeal extends AbstractDateOrderedRssSource
 {
-    protected static $comics = array(
-        'oatmeal' => 'The Oatmeal',
-    );
+    protected string $feedUrl      = 'https://feeds.feedburner.com/oatmealfeed';
+    protected string $tagWithImage = 'description';
 
-    protected $comicBase      = 'https://www.theoatmeal.com';
-    protected $comicShortName = 'oatmeal';
-    protected $feedUrl        = 'https://feeds.feedburner.com/oatmealfeed';
-    protected $tagWithImage   = 'description';
+    public static function provides(): Comic
+    {
+        return Comic::createBaseComic(
+            'oatmeal',
+            'The Oatmeal',
+            'https://www.theoatmeal.com/',
+        );
+    }
 }

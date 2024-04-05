@@ -1,8 +1,6 @@
 <?php
-/**
- * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) Matthew Weier O'Phinney
- */
+
+declare(strict_types=1);
 
 namespace PhlyComic\Console;
 
@@ -12,6 +10,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+
+use function file_put_contents;
+use function sprintf;
 
 class FetchComic extends Command
 {
@@ -39,10 +40,10 @@ class FetchComic extends Command
         );
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output) : void
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->status = 0;
-        $io = new SymfonyStyle($input, $output);
+        $io           = new SymfonyStyle($input, $output);
 
         if (! $this->validateComicAlias($io, $input->getArgument('comic') ?: '')) {
             $this->status = 1;
@@ -54,7 +55,7 @@ class FetchComic extends Command
         }
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         if ($this->status > 0) {
@@ -72,9 +73,15 @@ class FetchComic extends Command
         $io->progressStart();
 
         if ($comic->hasError()) {
-            $html = sprintf($this->errorTemplate . "\n", $comic->getLink(), $comic->getName(), $comic->getError());
+            $html = sprintf($this->errorTemplate . "\n", $comic->url, $comic->title, $comic->error);
         } else {
-            $html = sprintf($this->comicTemplate . "\n", $comic->getLink(), $comic->getName(), $comic->getDaily(), $comic->getImage());
+            $html = sprintf(
+                $this->comicTemplate . "\n",
+                $comic->url,
+                $comic->title,
+                $comic->instanceUrl,
+                $comic->instanceImageUrl
+            );
         }
 
         $path = $input->getOption('output') ?: sprintf('data/comics/%s.html', $name);

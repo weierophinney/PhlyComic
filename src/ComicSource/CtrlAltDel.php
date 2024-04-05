@@ -1,25 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
 
 use DOMXPath;
+use PhlyComic\Comic;
 use PhpCss;
+
+use function preg_match;
+use function strstr;
 
 class CtrlAltDel extends AbstractDomSource
 {
-    protected static $comics = array(
-        'ctrlaltdel' => 'Ctrl+Alt+Del',
-    );
+    protected string $dailyFormat     = 'http://cad-comic.com/';
+    protected bool $domIsHtml         = true;
+    protected string $domQuery        = '.comicpage a img';
+    protected string $domQueryForLink = '.comicpage a';
+    protected bool $useComicBase      = true;
 
-    protected $comicBase       = 'http://cad-comic.com/';
-    protected $comicShortName  = 'ctrlaltdel';
-    protected $dailyFormat     = 'http://cad-comic.com/';
-    protected $domIsHtml       = true;
-    protected $domQuery        = '.comicpage a img';
-    protected $domQueryForLink = '.comicpage a';
-    protected $useComicBase    = true;
+    public static function provides(): Comic
+    {
+        return Comic::createBaseComic(
+            'ctrlaltdel',
+            'Ctrl+Alt+Del',
+            'http://www.cad-comic.com/',
+        );
+    }
 
-    protected function validateImageSrc($src)
+    protected function validateImageSrc(string $src): bool
     {
         if (strstr($src, '//cad-comic.com/wp-content/uploads/')) {
             return true;
@@ -27,7 +36,7 @@ class CtrlAltDel extends AbstractDomSource
         return false;
     }
 
-    protected function getDailyUrl($imgUrl, DOMXPath $xpath)
+    protected function getDailyUrl(string $imgUrl, DOMXPath $xpath): string
     {
         foreach ($xpath->query(PhpCss::toXpath($this->domQueryForLink)) as $node) {
             if (! $node->hasAttribute('href')) {
@@ -41,6 +50,7 @@ class CtrlAltDel extends AbstractDomSource
 
             return $href;
         }
-        return $this->comicBase;
+
+        return self::provides()->url;
     }
 }

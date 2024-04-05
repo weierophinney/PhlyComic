@@ -1,91 +1,62 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
+use PhlyComic\HttpClient;
 use SimpleXMLElement;
 
+use function preg_match;
 use function simplexml_load_string;
+use function sprintf;
 
 abstract class AbstractRssSource extends AbstractComicSource
 {
-    /**
-     * @var string Base URL to landing page for comic
-     */
-    protected $comicBase;
+    /** @var null|string Content of most recent item investigated in feed */
+    protected ?string $content;
 
-    /**
-     * @var string Short name of comic
-     */
-    protected $comicShortName;
-
-    /**
-     * @var null|string Content of most recent item investigated in feed
-     */
-    protected $content;
-
-    /**
-     * @var string URI to a feed
-     */
-    protected $feedUrl;
+    /** @var string URI to a feed */
+    protected string $feedUrl;
 
     /**
      * The namespace of the tag that holds the image, if any
-     *
-     * @var false|string
      */
-    protected $tagNamespace = false;
+    protected false|string $tagNamespace = false;
 
     /**
      * What tag in the feed contains the image?
-     *
-     * @var string
      */
-    protected $tagWithImage = 'description';
+    protected string $tagWithImage = 'description';
 
-    public function fetch()
+    public function fetch(HttpClient $client): Comic
     {
+        $comic         = static::provides();
         $this->content = null;
 
         // Retrieve feed to parse
-        $rawFeed = $this->fetchFeed($this->feedUrl);
+        $response = $client->sendRequest($client->createRequest('GET', $this->feedUrl));
+        if ($response->getStatusCode() > 299) {
+            return $comic->withError('Unable to fetch feed');
+        }
+        $rawFeed = (string) $response->getBody();
 
         $sxl = $this->getXmlElement($rawFeed);
         if ($sxl instanceof Comic) {
             return $sxl;
         }
 
-        $data = $this->getDataFromFeed($sxl);
-
-        if ($data instanceof Comic) {
-            return $data;
-        }
-
-        if (!$data) {
-            return $this->registerError(sprintf(
-                '%s feed does not include image description containing image URL: %s',
-                static::$comics[$this->comicShortName],
-                $this->content
-            ));
-        }
-
-        $comic = new Comic(
-            /* 'name'  => */ static::$comics[$this->comicShortName],
-            /* 'link'  => */ $this->comicBase,
-            /* 'daily' => */ $data['daily'],
-            /* 'image' => */ $data['image']
-        );
-
-        return $comic;
+        return $this->getDataFromFeed($sxl, $client);
     }
 
-    protected function getContent(SimpleXMLElement $item)
+    protected function getContent(SimpleXMLElement $item): string
     {
-        if (!$this->tagNamespace) {
+        if (! $this->tagNamespace) {
             return (string) $item->{$this->tagWithImage};
         }
 
-        $namespacedChildren = $item->children($this->tagNamespace);
+        $namespacedChildren = $item->children($this->tagNamespace, true);
         return (string) $namespacedChildren->{$this->tagWithImage};
     }
 
@@ -94,13 +65,13 @@ abstract class AbstractRssSource extends AbstractComicSource
      *     error occurs during parsing; otherwise, returns the SimpleXMLElement
      *     representing the content.
      */
-    protected function getXmlElement(string $xml)
+    protected function getXmlElement(string $xml): SimpleXMLElement|Comic
     {
         $feed = simplexml_load_string($xml);
         if ($feed === false) {
             return $this->registerError(sprintf(
                 '%s feed cannot be parsed',
-                static::$comics[$this->comicShortName],
+                static::provides()->name,
                 $this->content
             ));
         }
@@ -108,7 +79,7 @@ abstract class AbstractRssSource extends AbstractComicSource
         return $feed;
     }
 
-    protected function getDataFromFeed(SimpleXMLElement $feed)
+    protected function getDataFromFeed(SimpleXMLElement $feed, HttpClient $client): Comic
     {
         foreach ($feed->channel->item as $latest) {
             if (! $this->isOfInterest($latest)) {
@@ -124,11 +95,8 @@ abstract class AbstractRssSource extends AbstractComicSource
                 return $image;
             }
 
-            if ($image) {
-                return array(
-                    'daily' => $daily,
-                    'image' => $image,
-                );
+            if (! empty($image)) {
+                return static::provides()->withInstance($daily, $image);
             }
 
             // First item seeds content
@@ -136,48 +104,26 @@ abstract class AbstractRssSource extends AbstractComicSource
                 $this->content = $content;
             }
         }
-        return false;
+
+        $comic = static::provides();
+        return $comic->withError(sprintf(
+            '%s feed does not include image description containing image URL: %s',
+            $comic->name,
+            $this->content,
+        ));
     }
 
-    protected function getImageFromContent($content)
+    protected function getImageFromContent(string $content): string|Comic
     {
         // image is in content -- /src="([^"]+)"
-        if (preg_match('/\<img [^>]*src="(?P<src>[^"]+)"/', $content, $matches)) {
+        if (preg_match('/\<img [^>]*src="(?P<src>[^"]+)"/u', $content, $matches)) {
             return $matches['src'];
         }
 
-        fwrite(STDERR, "Unable to find img tag: $content\n");
-        return false;
+        return static::provides()->withError("Unable to find img tag: $content");
     }
 
-    protected function registerError($message)
-    {
-        $comic = new Comic(
-            /* 'name'  => */ static::$comics[$this->comicShortName],
-            /* 'link'  => */ $this->comicBase
-        );
-        $comic->setError($message);
-        return $comic;
-    }
-
-    protected function fetchFeed($url)
-    {
-        $curl = curl_init();
-        curl_setopt($curl, CURLOPT_URL, $url);
-        curl_setopt($curl, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($curl, CURLOPT_MAXREDIRS, 5);
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt(
-            $curl,
-            CURLOPT_USERAGENT,
-            'Mozilla/5.0 (Windows; U; Windows NT 5.1; rv:1.7.3) Gecko/20041001 Firefox/0.10.1'
-        );
-        $content = curl_exec($curl);
-        curl_close($curl);
-        return $content;
-    }
-
-    protected function isOfInterest($item)
+    protected function isOfInterest(SimpleXMLElement|string $item): bool
     {
         return true;
     }

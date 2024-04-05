@@ -1,7 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace PhlyComic\ComicSource;
 
+use PhlyComic\Comic;
 use PhlyComic\ComicSource;
 
 /**
@@ -9,25 +12,8 @@ use PhlyComic\ComicSource;
  */
 abstract class AbstractComicSource implements ComicSource
 {
-    /**
-     * Assoc array of shortname => title pairs detailing supported comics
-     */
-    protected static $comics = array();
-
-    protected $error = false;
-
-    public static function supports()
+    protected function registerError(string $message): Comic
     {
-        return static::$comics;
-    }
-
-    protected function registerError($message)
-    {
-        $this->error = $message;
-    }
-
-    public function getError()
-    {
-        return $this->error;
+        return static::provides()->withError($message);
     }
 }
