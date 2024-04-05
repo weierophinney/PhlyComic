@@ -8,13 +8,16 @@ use DOMXPath;
 use PhlyComic\Comic;
 use PhpCss;
 
+use function preg_match;
+use function strstr;
+
 class CtrlAltDel extends AbstractDomSource
 {
-    protected $dailyFormat     = 'http://cad-comic.com/';
-    protected $domIsHtml       = true;
-    protected $domQuery        = '.comicpage a img';
-    protected $domQueryForLink = '.comicpage a';
-    protected $useComicBase    = true;
+    protected string $dailyFormat     = 'http://cad-comic.com/';
+    protected bool $domIsHtml         = true;
+    protected string $domQuery        = '.comicpage a img';
+    protected string $domQueryForLink = '.comicpage a';
+    protected bool $useComicBase      = true;
 
     public static function provides(): Comic
     {

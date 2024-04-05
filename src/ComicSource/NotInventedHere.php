@@ -8,8 +8,8 @@ use PhlyComic\Comic;
 
 class NotInventedHere extends AbstractAtomSource
 {
-    protected $feedUrl      = 'https://notinventedhe.re/feed';
-    protected $tagWithImage = 'content';
+    protected string $feedUrl      = 'https://notinventedhe.re/feed';
+    protected string $tagWithImage = 'content';
 
     public static function provides(): Comic
     {

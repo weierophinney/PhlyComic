@@ -8,6 +8,8 @@ use PhlyComic\Comic;
 use PhlyComic\HttpClient;
 use SimpleXMLElement;
 
+use function sprintf;
+
 abstract class AbstractAtomSource extends AbstractRssSource
 {
     protected function getDataFromFeed(SimpleXMLElement $feed, HttpClient $client): Comic

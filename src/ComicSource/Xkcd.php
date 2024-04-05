@@ -8,7 +8,7 @@ use PhlyComic\Comic;
 
 class Xkcd extends AbstractRssSource
 {
-    protected $feedUrl = 'https://xkcd.com/rss.xml';
+    protected string $feedUrl = 'https://xkcd.com/rss.xml';
 
     public static function provides(): Comic
     {

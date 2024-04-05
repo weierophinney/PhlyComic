@@ -10,6 +10,11 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\UriInterface;
 
+use function explode;
+use function preg_match;
+use function rtrim;
+use function strstr;
+
 final class HttpClient implements ClientInterface, RequestFactoryInterface
 {
     public function __construct(
@@ -18,6 +23,7 @@ final class HttpClient implements ClientInterface, RequestFactoryInterface
     ) {
     }
 
+    /** @param string|UriInterface $uri */
     public function createRequest(string $method, $uri): RequestInterface
     {
         return $this->requestFactory
@@ -31,7 +37,7 @@ final class HttpClient implements ClientInterface, RequestFactoryInterface
     public function sendRequest(RequestInterface $request): ResponseInterface
     {
         $redirects = 0;
-        
+
         do {
             $response = $this->client->sendRequest($request);
             if ($response->getStatusCode() > 299 && $response->getStatusCode() < 400) {

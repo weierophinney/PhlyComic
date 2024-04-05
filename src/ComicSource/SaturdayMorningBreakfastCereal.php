@@ -11,6 +11,9 @@ use PhlyComic\HttpClient;
 use PhpCss;
 use SimpleXMLElement;
 
+use function count;
+use function sprintf;
+
 /**
  * The SMBC feed provides a link to the **page** containing the comic,
  * but the link to the comic image is buried inside the description.
@@ -21,8 +24,8 @@ use SimpleXMLElement;
  */
 class SaturdayMorningBreakfastCereal extends AbstractRssSource
 {
-    protected $domQuery       = 'img';
-    protected $feedUrl        = 'https://www.smbc-comics.com/comics/rss';
+    protected string $domQuery = 'img';
+    protected string $feedUrl  = 'https://www.smbc-comics.com/comics/rss';
 
     public static function provides(): Comic
     {
@@ -52,11 +55,11 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
         return $comic->withError('Unable to find image in feed for ' . $comic->name);
     }
 
-    protected function getImageFromDescription($description, $url): string|Comic
+    protected function getImageFromDescription(string $description, string $url): string|Comic
     {
         $document = new DOMDocument('1.0', 'UTF-8');
         $document->loadHTML($description);
-        $xpath = new DOMXPath($document);
+        $xpath   = new DOMXPath($document);
         $results = $xpath->query(PhpCss::toXpath($this->domQuery));
 
         if (false === $results || ! count($results)) {

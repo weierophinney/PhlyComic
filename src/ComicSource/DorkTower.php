@@ -6,11 +6,13 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 
+use function preg_match;
+
 class DorkTower extends AbstractRssSource
 {
-    protected $feedUrl        = 'http://www.dorktower.com/feed/';
-    protected $tagNamespace   = 'content';
-    protected $tagWithImage   = 'encoded';
+    protected string $feedUrl            = 'http://www.dorktower.com/feed/';
+    protected false|string $tagNamespace = 'content';
+    protected string $tagWithImage       = 'encoded';
 
     public static function provides(): Comic
     {

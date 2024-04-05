@@ -8,7 +8,7 @@ use PhlyComic\Comic;
 
 class ListenToMe extends AbstractRssSource
 {
-    protected $feedUrl = 'https://feeds.feedburner.com/PLTM';
+    protected string $feedUrl = 'https://feeds.feedburner.com/PLTM';
 
     public static function provides(): Comic
     {

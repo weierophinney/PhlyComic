@@ -4,9 +4,40 @@ declare(strict_types=1);
 
 namespace PhlyComic;
 
+use PhlyComic\ComicSource\BasicInstructions;
+use PhlyComic\ComicSource\BloomCounty;
+use PhlyComic\ComicSource\CalvinAndHobbes;
+use PhlyComic\ComicSource\CloseToHome;
+use PhlyComic\ComicSource\CommitStrip;
+use PhlyComic\ComicSource\CtrlAltDel;
+use PhlyComic\ComicSource\CulDeSac;
+use PhlyComic\ComicSource\DorkTower;
+use PhlyComic\ComicSource\Drive;
+use PhlyComic\ComicSource\FMinus;
+use PhlyComic\ComicSource\ForBetterOrForWorse;
+use PhlyComic\ComicSource\FoxTrot;
+use PhlyComic\ComicSource\GarfieldMinusGarfield;
+use PhlyComic\ComicSource\Goats;
+use PhlyComic\ComicSource\LakeGary;
+use PhlyComic\ComicSource\ListenToMe;
+use PhlyComic\ComicSource\LunarBaboon;
+use PhlyComic\ComicSource\NonSequitur;
+use PhlyComic\ComicSource\NotInventedHere;
+use PhlyComic\ComicSource\Oatmeal;
+use PhlyComic\ComicSource\Peanuts;
+use PhlyComic\ComicSource\PennyArcade;
+use PhlyComic\ComicSource\PhDComics;
+use PhlyComic\ComicSource\Pickles;
+use PhlyComic\ComicSource\ReptilisRex;
+use PhlyComic\ComicSource\SaturdayMorningBreakfastCereal;
+use PhlyComic\ComicSource\ScenesFromAMultiverse;
+use PhlyComic\ComicSource\Sheldon;
+use PhlyComic\ComicSource\Xkcd;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\ContainerInterface;
 use RuntimeException;
+
+use function array_key_exists;
 
 final class ComicFactory implements ContainerInterface
 {
@@ -20,7 +51,7 @@ final class ComicFactory implements ContainerInterface
             $supported[$class]      = $comic;
         }
 
-        $this->aliasMap = $aliasMap;
+        $this->aliasMap  = $aliasMap;
         $this->supported = $supported;
     }
 
@@ -32,7 +63,7 @@ final class ComicFactory implements ContainerInterface
     public function get(string $name): ComicSource
     {
         if (! array_key_exists($name, $this->aliasMap)) {
-            throw new class($name) extends RuntimeException implements ContainerExceptionInterface {
+            throw new class ($name) extends RuntimeException implements ContainerExceptionInterface {
                 public function __construct(string $name)
                 {
                     parent::__construct("Comic source by name '$name' does not exist");
@@ -51,35 +82,35 @@ final class ComicFactory implements ContainerInterface
 
     /** @var list<class-string<ComicSource>> List of comic source classes */
     private const COMIC_SOURCES = [
-        'PhlyComic\ComicSource\BasicInstructions',
-        'PhlyComic\ComicSource\BloomCounty',
-        'PhlyComic\ComicSource\CalvinAndHobbes',
-        'PhlyComic\ComicSource\CloseToHome',
-        'PhlyComic\ComicSource\CommitStrip',
-        'PhlyComic\ComicSource\CtrlAltDel',
-        'PhlyComic\ComicSource\CulDeSac',
-        'PhlyComic\ComicSource\DorkTower',
-        'PhlyComic\ComicSource\Drive',
-        'PhlyComic\ComicSource\FMinus',
-        'PhlyComic\ComicSource\ForBetterOrForWorse',
-        'PhlyComic\ComicSource\FoxTrot',
-        'PhlyComic\ComicSource\GarfieldMinusGarfield',
-        'PhlyComic\ComicSource\Goats',
-        'PhlyComic\ComicSource\LakeGary',
-        'PhlyComic\ComicSource\ListenToMe',
-        'PhlyComic\ComicSource\LunarBaboon',
-        'PhlyComic\ComicSource\NonSequitur',
-        'PhlyComic\ComicSource\NotInventedHere',
-        'PhlyComic\ComicSource\Oatmeal',
-        'PhlyComic\ComicSource\Peanuts',
-        'PhlyComic\ComicSource\PennyArcade',
-        'PhlyComic\ComicSource\PhDComics',
-        'PhlyComic\ComicSource\Pickles',
-        'PhlyComic\ComicSource\ReptilisRex',
-        'PhlyComic\ComicSource\SaturdayMorningBreakfastCereal',
-        'PhlyComic\ComicSource\ScenesFromAMultiverse',
-        'PhlyComic\ComicSource\Sheldon',
-        'PhlyComic\ComicSource\Xkcd',
+        BasicInstructions::class,
+        BloomCounty::class,
+        CalvinAndHobbes::class,
+        CloseToHome::class,
+        CommitStrip::class,
+        CtrlAltDel::class,
+        CulDeSac::class,
+        DorkTower::class,
+        Drive::class,
+        FMinus::class,
+        ForBetterOrForWorse::class,
+        FoxTrot::class,
+        GarfieldMinusGarfield::class,
+        Goats::class,
+        LakeGary::class,
+        ListenToMe::class,
+        LunarBaboon::class,
+        NonSequitur::class,
+        NotInventedHere::class,
+        Oatmeal::class,
+        Peanuts::class,
+        PennyArcade::class,
+        PhDComics::class,
+        Pickles::class,
+        ReptilisRex::class,
+        SaturdayMorningBreakfastCereal::class,
+        ScenesFromAMultiverse::class,
+        Sheldon::class,
+        Xkcd::class,
     ];
 
     /** @var array<non-empty-string, class-string> */

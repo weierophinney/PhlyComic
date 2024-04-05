@@ -8,17 +8,16 @@ use PhlyComic\Comic;
 use PhlyComic\HttpClient;
 use PhpCss;
 
+use function count;
+use function file_get_contents;
+
 class Sheldon extends AbstractComicSource
 {
     use XPathTrait;
 
-    private const SELECTOR_NEXT = 'a#sidenav-next';
-    private const SELECTOR_PREV = 'a#sidenav-prev';
+    private const SELECTOR_NEXT  = 'a#sidenav-next';
+    private const SELECTOR_PREV  = 'a#sidenav-prev';
     private const SELECTOR_COMIC = '#spliced-comic span img';
-
-    protected static $comics = array(
-        'sheldon' => 'Sheldon',
-    );
 
     public static function provides(): Comic
     {
@@ -52,7 +51,7 @@ class Sheldon extends AbstractComicSource
 
     private function getUrlFromPageNode(string $content, string $selector, string $attribute = 'href'): ?string
     {
-        $xpath = $this->getXPathForDocument($content);
+        $xpath   = $this->getXPathForDocument($content);
         $results = $xpath->query(PhpCss::toXpath($selector));
         if (false === $results || 0 === count($results)) {
             return null;

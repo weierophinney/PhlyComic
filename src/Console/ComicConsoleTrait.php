@@ -2,13 +2,9 @@
 
 declare(strict_types=1);
 
-/**
- * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) Matthew Weier O'Phinney
- */
-
 namespace PhlyComic\Console;
 
+use Exception;
 use Http\Discovery\Psr17FactoryDiscovery;
 use Http\Discovery\Psr18ClientDiscovery;
 use PhlyComic\Comic;
@@ -16,9 +12,14 @@ use PhlyComic\ComicFactory;
 use PhlyComic\HttpClient;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+use function dirname;
+use function is_dir;
+use function is_writable;
+use function sprintf;
+
 trait ComicConsoleTrait
 {
-    private ?HttpClient $client = null;
+    private ?HttpClient $client    = null;
     private ?ComicFactory $factory = null;
 
     /**
@@ -26,7 +27,7 @@ trait ComicConsoleTrait
      *
      * @var string
      */
-    private $comicTemplate = <<< 'EOT'
+    private $comicTemplate = <<<'EOT'
         <div class="comic">
             <h4><a href="%s">%s</a></h4>
             <p><a href="%s"><img referrerpolicy="no-referrer" src="%s"/></a></p>
@@ -38,21 +39,20 @@ trait ComicConsoleTrait
      *
      * @var string
      */
-    private $errorTemplate = <<< 'EOT'
+    private $errorTemplate = <<<'EOT'
         <div class="comic">
             <h4><a href="%s">%s</a></h4>
             <p class="error">%s</p>
         </div>
         EOT;
 
-    private $status;
+    private int $status;
 
     /**
      * Report an error to the display
      *
-     * @param SymfonyStyle $console
      * @param string $message
-     * @param null|\Exception $e
+     * @param null|Exception $e
      */
     private function reportError(SymfonyStyle $console, $message, $e = null)
     {
@@ -65,9 +65,9 @@ trait ComicConsoleTrait
     /**
      * Fetch a named comic
      */
-    private function fetchComic(string $name, SymfonyStyle $console) : ?Comic
+    private function fetchComic(string $name, SymfonyStyle $console): ?Comic
     {
-        $source  = $this->getFactory()->get($name);
+        $source = $this->getFactory()->get($name);
         $console->text(sprintf('<info>Fetching "%s"</>', $name));
         $console->progressStart();
 
@@ -84,7 +84,7 @@ trait ComicConsoleTrait
         return $comic;
     }
 
-    private function validateComicAlias(SymfonyStyle $console, string $alias) : bool
+    private function validateComicAlias(SymfonyStyle $console, string $alias): bool
     {
         if ($this->getFactory()->has($alias)) {
             return true;
@@ -94,7 +94,7 @@ trait ComicConsoleTrait
         return false;
     }
 
-    private function validateOutputValue(SymfonyStyle $console, string $output) : bool
+    private function validateOutputValue(SymfonyStyle $console, string $output): bool
     {
         if (! is_dir(dirname($output))) {
             $console->caution(sprintf("Output directory '%s' does not exist", dirname($output)));

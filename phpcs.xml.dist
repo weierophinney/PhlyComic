@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<ruleset xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/squizlabs/php_codesniffer/phpcs.xsd">
+
+    <arg name="basepath" value="."/>
+    <arg name="cache" value=".phpcs-cache"/>
+    <arg name="colors"/>
+    <arg name="extensions" value="php"/>
+    <arg name="parallel" value="80"/>
+    
+    <!-- Show progress -->
+    <arg value="p"/>
+
+    <!-- Paths to check -->
+    <file>bin</file>
+    <file>src</file>
+
+    <!-- Include all rules from the Laminas Coding Standard -->
+    <rule ref="LaminasCodingStandard">
+        <exclude name="WebimpressCodingStandard.NamingConventions.Interface.Suffix"/>
+        <exclude name="WebimpressCodingStandard.NamingConventions.AbstractClass.Prefix"/>
+    </rule>
+
+    <rule ref="PSR1.Files.SideEffects.FoundWithSymbols">
+        <exclude-pattern>bin/phly-comic.php</exclude-pattern>
+    </rule>
+</ruleset>

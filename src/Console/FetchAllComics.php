@@ -2,11 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) Matthew Weier O'Phinney
- */
-
 namespace PhlyComic\Console;
 
 use PhlyComic\Comic;
@@ -19,11 +14,26 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 use Throwable;
 
+use function array_filter;
+use function ctype_digit;
+use function file_exists;
+use function file_put_contents;
+use function getcwd;
+use function implode;
+use function in_array;
+use function is_int;
+use function is_string;
+use function ksort;
+use function realpath;
+use function sprintf;
+
+use const SORT_NATURAL;
+
 class FetchAllComics extends Command
 {
     use ComicConsoleTrait;
 
-    private $processes = 0;
+    private int $processes = 0;
 
     protected function configure()
     {
@@ -63,7 +73,7 @@ class FetchAllComics extends Command
 
     public function initialize(InputInterface $input, OutputInterface $output): void
     {
-        $io = new SymfonyStyle($input, $output);
+        $io           = new SymfonyStyle($input, $output);
         $this->status = 0;
 
         $outputPath = $input->getOption('output');
@@ -126,7 +136,7 @@ class FetchAllComics extends Command
 
     private function fetchSync(array $comics, SymfonyStyle $console): string
     {
-        $html  = '';
+        $html = '';
         foreach ($comics as $toFetch) {
             $comic = $this->fetchComic($toFetch->name, $console);
             if (! $comic instanceof Comic) {

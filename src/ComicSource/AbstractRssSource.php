@@ -8,37 +8,31 @@ use PhlyComic\Comic;
 use PhlyComic\HttpClient;
 use SimpleXMLElement;
 
+use function preg_match;
 use function simplexml_load_string;
+use function sprintf;
 
 abstract class AbstractRssSource extends AbstractComicSource
 {
-    /**
-     * @var null|string Content of most recent item investigated in feed
-     */
-    protected $content;
+    /** @var null|string Content of most recent item investigated in feed */
+    protected ?string $content;
 
-    /**
-     * @var string URI to a feed
-     */
-    protected $feedUrl;
+    /** @var string URI to a feed */
+    protected string $feedUrl;
 
     /**
      * The namespace of the tag that holds the image, if any
-     *
-     * @var false|string
      */
-    protected $tagNamespace = false;
+    protected false|string $tagNamespace = false;
 
     /**
      * What tag in the feed contains the image?
-     *
-     * @var string
      */
-    protected $tagWithImage = 'description';
+    protected string $tagWithImage = 'description';
 
     public function fetch(HttpClient $client): Comic
     {
-        $comic = static::provides();
+        $comic         = static::provides();
         $this->content = null;
 
         // Retrieve feed to parse

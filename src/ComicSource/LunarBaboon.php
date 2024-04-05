@@ -8,7 +8,7 @@ use PhlyComic\Comic;
 
 class LunarBaboon extends AbstractRssSource
 {
-    protected $feedUrl = 'http://www.lunarbaboon.com/comics/rss.xml';
+    protected string $feedUrl = 'http://www.lunarbaboon.com/comics/rss.xml';
 
     public static function provides(): Comic
     {

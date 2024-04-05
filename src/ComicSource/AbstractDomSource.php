@@ -9,39 +9,31 @@ use PhlyComic\Comic;
 use PhlyComic\HttpClient;
 use PhpCss;
 
+use function count;
+use function date;
+use function sprintf;
+
 abstract class AbstractDomSource extends AbstractComicSource
 {
     use XPathTrait;
 
-    /**
-     * @var string sprintf() string indicating URL format
-     */
-    protected $dailyFormat = '%s';
+    /** @var string sprintf() string indicating URL format */
+    protected string $dailyFormat = '%s';
 
-    /**
-     * @var string Date format as a substitution in the {@link $dailyFormat}
-     */
-    protected $dateFormat = 'Y/m/d';
+    /** @var string Date format as a substitution in the {@link $dailyFormat} */
+    protected string $dateFormat = 'Y/m/d';
 
-    /**
-     * @var string CSS query string describing location of image in page
-     */
-    protected $domQuery = '';
+    /** @var string CSS query string describing location of image in page */
+    protected string $domQuery = '';
 
-    /**
-     * @var bool Is the DOM structure HTML?
-     */
-    protected $domIsHtml = false;
+    /** @var bool Is the DOM structure HTML? */
+    protected bool $domIsHtml = false;
 
-    /**
-     * @var string DOM attribute of img tag to use
-     */
-    protected $domAttribute = 'src';
+    /** @var string DOM attribute of img tag to use */
+    protected string $domAttribute = 'src';
 
-    /**
-     * @var bool Use the comicBase instead of the daily format to retrieve
-     */
-    protected $useComicBase = false;
+    /** @var bool Use the comicBase instead of the daily format to retrieve */
+    protected bool $useComicBase = false;
 
     public function fetch(HttpClient $client): Comic
     {
@@ -70,7 +62,7 @@ abstract class AbstractDomSource extends AbstractComicSource
         return false;
     }
 
-    protected function fetchComic(HttpClient $client, string $url) : Comic
+    protected function fetchComic(HttpClient $client, string $url): Comic
     {
         $response = $client->sendRequest($client->createRequest('GET', $url));
         if ($response->getStatusCode() > 299) {
@@ -80,8 +72,8 @@ abstract class AbstractDomSource extends AbstractComicSource
             ));
         }
 
-        $page  = $response->getBody()->__toString();
-        $xpath = $this->getXPathForDocument($page);
+        $page    = $response->getBody()->__toString();
+        $xpath   = $this->getXPathForDocument($page);
         $results = $xpath->query(PhpCss::toXpath($this->domQuery));
         if (false === $results || ! count($results)) {
             return $this->registerError(sprintf(

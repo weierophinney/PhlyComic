@@ -8,8 +8,8 @@ use PhlyComic\Comic;
 
 class Oatmeal extends AbstractDateOrderedRssSource
 {
-    protected $feedUrl        = 'https://feeds.feedburner.com/oatmealfeed';
-    protected $tagWithImage   = 'description';
+    protected string $feedUrl      = 'https://feeds.feedburner.com/oatmealfeed';
+    protected string $tagWithImage = 'description';
 
     public static function provides(): Comic
     {

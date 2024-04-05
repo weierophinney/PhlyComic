@@ -4,15 +4,20 @@ declare(strict_types=1);
 
 namespace PhlyComic\ComicSource;
 
-use PhlyComic\Comic;
 use DOMDocument;
 use DOMElement;
 use DOMXPath;
+use PhlyComic\Comic;
 use PhlyComic\HttpClient;
+
+use function simplexml_load_string;
+use function sprintf;
+
+use const LIBXML_NOCDATA;
 
 class ScenesFromAMultiverse extends AbstractComicSource
 {
-    protected $feedUrl   = 'http://feeds.feedburner.com/ScenesFromAMultiverse';
+    protected string $feedUrl = 'http://feeds.feedburner.com/ScenesFromAMultiverse';
 
     public static function provides(): Comic
     {
@@ -40,13 +45,13 @@ class ScenesFromAMultiverse extends AbstractComicSource
         $daily = (string) $latest->guid;
 
         // Parse description
-        $desc   = (string) $latest->description;
-        $dom    = new DOMDocument();
+        $desc = (string) $latest->description;
+        $dom  = new DOMDocument();
         $dom->loadHTML($desc);
 
         $xpath  = new DOMXPath($dom);
         $result = $xpath->query('//a/img');
-        if (!$result || !$result->length) {
+        if (! $result || ! $result->length) {
             return $this->registerError(sprintf(
                 'Unable to find Scenes From A Multiverse comic image in description ("%s")',
                 $desc

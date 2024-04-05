@@ -9,6 +9,9 @@ use PhlyComic\HttpClient;
 use PhpCss;
 use SimpleXMLElement;
 
+use function count;
+use function sprintf;
+
 /**
  * For use with feeds that contain links to pages containing the comic, but not
  * the comic itself.
@@ -25,7 +28,7 @@ abstract class AbstractRssAndDomSource extends AbstractRssSource
      * @var string The CSS query to execute on pages pulled from the feed in
      * order to identify the image tag.
      */
-    protected $domQuery       = '';
+    protected string $domQuery = '';
 
     /**
      * Which attribute of an img tag to use as the image source link.
@@ -42,8 +45,8 @@ abstract class AbstractRssAndDomSource extends AbstractRssSource
             }
 
             // Grab data from <link> element
-            $link    = (string) $latest->link;
-            $image   = $this->getImageFromLink($client, $link);
+            $link  = (string) $latest->link;
+            $image = $this->getImageFromLink($client, $link);
 
             // If we have a Comic, it's because of an
             // error; return it directly.
@@ -59,9 +62,6 @@ abstract class AbstractRssAndDomSource extends AbstractRssSource
         return static::provides()->withError('Unable to find latest image');
     }
 
-    /**
-     * @return Comic|string
-     */
     protected function getImageFromLink(HttpClient $client, string $url): string|Comic
     {
         $response = $client->sendRequest($client->createRequest('GET', $url));

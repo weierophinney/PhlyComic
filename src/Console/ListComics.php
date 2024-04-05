@@ -2,11 +2,6 @@
 
 declare(strict_types=1);
 
-/**
- * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) Matthew Weier O'Phinney
- */
-
 namespace PhlyComic\Console;
 
 use PhlyComic\ComicFactory;
@@ -14,6 +9,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+
+use function ksort;
 
 class ListComics extends Command
 {
@@ -28,7 +25,7 @@ class ListComics extends Command
         );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Supported comics');

@@ -8,7 +8,7 @@ use PhlyComic\Comic;
 
 class PhDComics extends AbstractRssSource
 {
-    protected $feedUrl = 'https://phdcomics.com/gradfeed.php';
+    protected string $feedUrl = 'https://phdcomics.com/gradfeed.php';
 
     public static function provides(): Comic
     {

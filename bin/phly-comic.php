@@ -1,24 +1,25 @@
 #!/usr/bin/env php
 <?php
-/**
- * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
- * @copyright Copyright (c) Matthew Weier O'Phinney
- */
+
+declare(strict_types=1);
 
 namespace PhlyComic\Console;
 
 use Symfony\Component\Console\Application;
 
+use function define;
+use function file_exists;
+
 switch (true) {
-    case (file_exists(__DIR__ . '/../vendor/autoload.php')):
+    case file_exists(__DIR__ . '/../vendor/autoload.php'):
         // Installed standalone
         require __DIR__ . '/../vendor/autoload.php';
         break;
-    case (file_exists(__DIR__ . '/../../../autoload.php')):
+    case file_exists(__DIR__ . '/../../../autoload.php'):
         // Installed as a Composer dependency
         require __DIR__ . '/../../../autoload.php';
         break;
-    case (file_exists('vendor/autoload.php')):
+    case file_exists('vendor/autoload.php'):
         // As a Composer dependency, relative to CWD
         require 'vendor/autoload.php';
         break;

@@ -9,13 +9,17 @@ use PhlyComic\Comic;
 use PhlyComic\HttpClient;
 use PhpCss;
 
+use function preg_match;
+use function sprintf;
+use function strstr;
+
 class CommitStrip extends AbstractDomSource
 {
-    protected $dailyFormat     = 'https://www.commitstrip.com/';
-    protected $domIsHtml       = true;
-    protected $domQuery        = '.excerpt img';
-    protected $domQueryForLink = '.excerpt a';
-    protected $useComicBase    = true;
+    protected string $dailyFormat     = 'https://www.commitstrip.com/';
+    protected bool $domIsHtml         = true;
+    protected string $domQuery        = '.excerpt img';
+    protected string $domQueryForLink = '.excerpt a';
+    protected bool $useComicBase      = true;
 
     public static function provides(): Comic
     {

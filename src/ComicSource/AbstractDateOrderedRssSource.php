@@ -10,6 +10,13 @@ use PhlyComic\Comic;
 use PhlyComic\HttpClient;
 use SimpleXMLElement;
 
+use function array_shift;
+use function fwrite;
+use function sprintf;
+use function usort;
+
+use const STDERR;
+
 abstract class AbstractDateOrderedRssSource extends AbstractRssSource
 {
     public function fetch(HttpClient $client): Comic
@@ -29,7 +36,6 @@ abstract class AbstractDateOrderedRssSource extends AbstractRssSource
         }
 
         return $this->getDataFromFeed($sxl, $client);
-
     }
 
     protected function getDataFromFeed(SimpleXMLElement $feed, HttpClient $client): Comic
@@ -73,7 +79,7 @@ abstract class AbstractDateOrderedRssSource extends AbstractRssSource
 
         usort($items, fn (array $a, array $b): int => $b['date'] <=> $a['date']);
 
-        $item = array_shift($items);
+        $item          = array_shift($items);
         $this->content = $item['content'];
 
         return static::provides()->withInstance($item['daily'], $item['image']);

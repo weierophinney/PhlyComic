@@ -7,11 +7,15 @@ namespace PhlyComic\ComicSource;
 use PhlyComic\Comic;
 use PhlyComic\HttpClient;
 
+use function date;
+use function sprintf;
+use function strtolower;
+
 class ForBetterOrForWorse extends AbstractComicSource
 {
-    protected $dailyFormat       = 'http://fborfw.com/strip_fix/%s/%s/%s/';
-    protected $imageFormat       = 'http://fborfw.com/strip_fix/strips/fb%s.gif';
-    protected $sundayImageFormat = 'http://fborfw.com/strip_fix/strips/fb%s.jpg';
+    protected string $dailyFormat       = 'http://fborfw.com/strip_fix/%s/%s/%s/';
+    protected string $imageFormat       = 'http://fborfw.com/strip_fix/strips/fb%s.gif';
+    protected string $sundayImageFormat = 'http://fborfw.com/strip_fix/strips/fb%s.jpg';
 
     public static function provides(): Comic
     {
@@ -24,7 +28,7 @@ class ForBetterOrForWorse extends AbstractComicSource
 
     public function fetch(HttpClient $client): Comic
     {
-        $format = match(strtolower(date('l'))) {
+        $format = match (strtolower(date('l'))) {
             'sunday' => $this->sundayImageFormat,
             default  => $this->imageFormat,
         };

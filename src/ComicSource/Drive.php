@@ -6,11 +6,13 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 
+use function preg_match;
+
 class Drive extends AbstractDomSource
 {
-    protected $domQuery            = 'div#unspliced-comic img';
-    protected $domIsHtml           = true;
-    protected $useComicBase        = true;
+    protected string $domQuery   = 'div#unspliced-comic img';
+    protected bool $domIsHtml    = true;
+    protected bool $useComicBase = true;
 
     public static function provides(): Comic
     {

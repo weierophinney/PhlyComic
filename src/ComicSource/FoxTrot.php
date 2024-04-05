@@ -9,10 +9,10 @@ use SimpleXMLElement;
 
 class FoxTrot extends AbstractRssAndDomSource
 {
-    protected $domQuery       = 'figure.wp-block-image img';
-    protected $feedUrl        = 'https://www.foxtrot.com/feed/';
-    protected $tagNamespace   = 'http://purl.org/rss/1.0/modules/content/';
-    protected $tagWithImage   = 'encoded';
+    protected string $domQuery           = 'figure.wp-block-image img';
+    protected string $feedUrl            = 'https://www.foxtrot.com/feed/';
+    protected false|string $tagNamespace = 'content';
+    protected string $tagWithImage       = 'encoded';
 
     public static function provides(): Comic
     {

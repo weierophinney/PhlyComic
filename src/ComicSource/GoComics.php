@@ -7,10 +7,13 @@ namespace PhlyComic\ComicSource;
 use PhlyComic\Comic;
 use PhlyComic\HttpClient;
 
+use function sprintf;
+use function strpos;
+
 abstract class GoComics extends AbstractDomSource
 {
-    protected $domQuery = 'picture.item-comic-image img';
-    private $baseUrl    = 'https://www.gocomics.com';
+    protected string $domQuery = 'picture.item-comic-image img';
+    private string $baseUrl    = 'https://www.gocomics.com';
 
     public function fetch(HttpClient $client): Comic
     {
@@ -35,7 +38,8 @@ abstract class GoComics extends AbstractDomSource
         $found = false;
 
         foreach ($xpath->document->getElementsByTagName('picture') as $node) {
-            if ($node->hasAttribute('class')
+            if (
+                $node->hasAttribute('class')
                 && false !== strpos($node->getAttribute('class'), 'item-comic-image')
             ) {
                 $found = $node;
@@ -68,7 +72,7 @@ abstract class GoComics extends AbstractDomSource
         return static::provides()->withInstance($href, $image);
     }
 
-    private function fetchMostRecentComicPageHrefFromLandingPage(HttpClient $client) : ?string
+    private function fetchMostRecentComicPageHrefFromLandingPage(HttpClient $client): ?string
     {
         $response = $client->sendRequest($client->createRequest('GET', static::provides()->url));
         if ($response->getStatusCode() > 299) {

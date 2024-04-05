@@ -8,9 +8,9 @@ use PhlyComic\Comic;
 
 class ReptilisRex extends AbstractRssSource
 {
-    protected $feedUrl = 'https://reptilisrex.com/feed/';
-    protected $tagNamespace = 'content';
-    protected $tagWithImage = 'encoded';
+    protected string $feedUrl            = 'https://reptilisrex.com/feed/';
+    protected false|string $tagNamespace = 'content';
+    protected string $tagWithImage       = 'encoded';
 
     public static function provides(): Comic
     {
