@@ -2,13 +2,18 @@
 
 namespace PhlyComic\ComicSource;
 
+use PhlyComic\Comic;
+
 class GarfieldMinusGarfield extends AbstractRssSource
 {
-    protected static $comics = array(
-        'g-g' => 'Garfield Minus Garfield',
-    );
+    protected $feedUrl = 'http://garfieldminusgarfield.net/rss';
 
-    protected $comicBase      = 'http://garfieldminusgarfield.net';
-    protected $comicShortName = 'g-g';
-    protected $feedUrl        = 'http://garfieldminusgarfield.net/rss';
+    public static function provides(): Comic
+    {
+        return Comic::createBaseComic(
+            'g-g',
+            'Garfield Minus Garfield',
+            'http://garfieldminusgarfield.net/',
+        );
+    }
 }
