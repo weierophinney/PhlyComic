@@ -2,13 +2,18 @@
 
 namespace PhlyComic\ComicSource;
 
+use PhlyComic\Comic;
+
 class LakeGary extends AbstractRssSource
 {
-    protected static $comics = array(
-        'lakegary' => 'Lake Gary',
-    );
+    protected $feedUrl = 'http://lakegary.com/rss';
 
-    protected $comicBase      = 'http://lakegary.com/';
-    protected $comicShortName = 'lakegary';
-    protected $feedUrl        = 'http://lakegary.com/rss';
+    public static function provides(): Comic
+    {
+        return Comic::createBaseComic(
+            'lakegary',
+            'Lake Gary',
+            'http://lakegary.com/',
+        );
+    }
 }
