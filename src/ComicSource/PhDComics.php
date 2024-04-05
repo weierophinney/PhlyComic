@@ -2,13 +2,18 @@
 
 namespace PhlyComic\ComicSource;
 
+use PhlyComic\Comic;
+
 class PhDComics extends AbstractRssSource
 {
-    protected static $comics = array(
-        'phd' => 'PhD Comics',
-    );
+    protected $feedUrl = 'https://phdcomics.com/gradfeed.php';
 
-    protected $comicBase      = 'http://phdcomics.com';
-    protected $comicShortName = 'phd';
-    protected $feedUrl        = 'http://phdcomics.com/gradfeed.php';
+    public static function provides(): Comic
+    {
+        return Comic::createBaseComic(
+            'phd',
+            'PhD Comics',
+            'https://phdcomics.com/',
+        );
+    }
 }
