@@ -28,7 +28,6 @@ use PhlyComic\ComicSource\Peanuts;
 use PhlyComic\ComicSource\PennyArcade;
 use PhlyComic\ComicSource\PhDComics;
 use PhlyComic\ComicSource\Pickles;
-use PhlyComic\ComicSource\ReptilisRex;
 use PhlyComic\ComicSource\SaturdayMorningBreakfastCereal;
 use PhlyComic\ComicSource\ScenesFromAMultiverse;
 use PhlyComic\ComicSource\Sheldon;
@@ -106,7 +105,6 @@ final class ComicFactory implements ContainerInterface
         PennyArcade::class,
         PhDComics::class,
         Pickles::class,
-        ReptilisRex::class,
         SaturdayMorningBreakfastCereal::class,
         ScenesFromAMultiverse::class,
         Sheldon::class,
