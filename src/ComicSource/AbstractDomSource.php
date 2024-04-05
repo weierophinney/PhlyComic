@@ -4,21 +4,12 @@ namespace PhlyComic\ComicSource;
 
 use DOMXPath;
 use PhlyComic\Comic;
+use PhlyComic\HttpClient;
 use PhpCss;
 
 abstract class AbstractDomSource extends AbstractComicSource
 {
     use XPathTrait;
-
-    /**
-     * @var string URL to comic landing page
-     */
-    protected $comicBase;
-
-    /**
-     * @var string short name of comic
-     */
-    protected $comicShortName;
 
     /**
      * @var string sprintf() string indicating URL format
@@ -50,53 +41,49 @@ abstract class AbstractDomSource extends AbstractComicSource
      */
     protected $useComicBase = false;
 
-    public function fetch()
+    public function fetch(HttpClient $client): Comic
     {
-        return $this->fetchComic($this->getUrl());
+        return $this->fetchComic($client, $this->getUrl());
     }
 
-    protected function getUrl() : string
+    protected function getUrl(): string
     {
         return $this->useComicBase
-            ? $this->comicBase
+            ? static::provides()->url
             : sprintf($this->dailyFormat, date($this->dateFormat));
     }
 
-    protected function validateImageSrc($src)
+    protected function validateImageSrc(string $src): bool
     {
         return true;
     }
 
-    protected function formatImageSrc($src)
+    protected function formatImageSrc(string $src): string
     {
         return $src;
     }
 
-    protected function getDailyUrl($imgUrl, DOMXPath $xpath)
+    protected function getDailyUrl(string $imgUrl, DOMXPath $xpath): false|string
     {
         return false;
     }
 
     protected function registerError($message)
     {
-        $comic = new Comic(
-            /* 'name'  => */ static::$comics[$this->comicShortName],
-            /* 'link'  => */ $this->comicBase
-        );
-        $comic->setError($message);
-        return $comic;
+        return static::provides()->withError($message);
     }
 
-    protected function fetchComic(string $url) : Comic
+    protected function fetchComic(HttpClient $client, string $url) : Comic
     {
-        $page = file_get_contents($url);
-        if (! $page) {
+        $response = $client->sendRequest($client->createRequest('GET', $url));
+        if ($response->getStatusCode() > 299) {
             return $this->registerError(sprintf(
                 'Comic at "%s" is unreachable',
                 $url
             ));
         }
 
+        $page  = $response->getBody()->__toString();
         $xpath = $this->getXPathForDocument($page);
         $results = $xpath->query(PhpCss::toXpath($this->domQuery));
         if (false === $results || ! count($results)) {
@@ -129,17 +116,10 @@ abstract class AbstractDomSource extends AbstractComicSource
             ));
         }
 
-        if (! ($dailyUrl = $this->getDailyUrl($imgUrl, $xpath))) {
+        if (false === $dailyUrl = $this->getDailyUrl($imgUrl, $xpath)) {
             $dailyUrl = $url;
         }
 
-        $comic = new Comic(
-            /* 'name'  => */ static::$comics[$this->comicShortName],
-            /* 'link'  => */ $this->comicBase,
-            /* 'daily' => */ $dailyUrl,
-            /* 'image' => */ $imgUrl
-        );
-
-        return $comic;
+        return self::provides()->withInstance($dailyUrl, $imgUrl);
     }
 }
