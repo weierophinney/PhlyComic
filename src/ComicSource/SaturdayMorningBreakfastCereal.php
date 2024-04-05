@@ -5,6 +5,7 @@ namespace PhlyComic\ComicSource;
 use DOMDocument;
 use DOMXPath;
 use PhlyComic\Comic;
+use PhlyComic\HttpClient;
 use PhpCss;
 use SimpleXMLElement;
 
@@ -18,33 +19,38 @@ use SimpleXMLElement;
  */
 class SaturdayMorningBreakfastCereal extends AbstractRssSource
 {
-    protected static $comics = array(
-        'smbc' => 'Saturday Morning Breakfast Cereal',
-    );
-
-    protected $comicBase      = 'http://www.smbc-comics.com/';
-    protected $comicShortName = 'smbc';
     protected $domQuery       = 'img';
-    protected $feedUrl        = 'http://www.smbc-comics.com/rss.php';
+    protected $feedUrl        = 'https://www.smbc-comics.com/comics/rss';
 
-    protected function getDataFromFeed(SimpleXMLElement $feed)
+    public static function provides(): Comic
     {
+        return Comic::createBaseComic(
+            'smbc',
+            'Saturday Morning Breakfast Cereal',
+            'https://www.smbc-comics.com/',
+        );
+    }
+
+    protected function getDataFromFeed(SimpleXMLElement $feed, HttpClient $client): Comic
+    {
+        $comic = self::provides();
+
         foreach ($feed->channel->item as $latest) {
             $description = (string) $latest->description;
             $link        = (string) $latest->link;
             $image       = $this->getImageFromDescription($description, $link);
 
-            if ($image) {
-                return array(
-                    'daily' => $link,
-                    'image' => $image,
-                );
+            if ($image instanceof Comic) {
+                continue;
             }
+
+            return $comic->withInstance($link, $image);
         }
-        return false;
+
+        return $comic->withError('Unable to find image in feed for ' . $comic->name);
     }
 
-    protected function getImageFromDescription($description, $url)
+    protected function getImageFromDescription($description, $url): string|Comic
     {
         $document = new DOMDocument('1.0', 'UTF-8');
         $document->loadHTML($description);
