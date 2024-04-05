@@ -120,6 +120,6 @@ abstract class AbstractDomSource extends AbstractComicSource
             $dailyUrl = $url;
         }
 
-        return self::provides()->withInstance($dailyUrl, $imgUrl);
+        return static::provides()->withInstance($dailyUrl, $imgUrl);
     }
 }
