@@ -2,21 +2,25 @@
 
 namespace PhlyComic\ComicSource;
 
+use PhlyComic\Comic;
 use SimpleXMLElement;
 
 class PennyArcade extends AbstractRssAndDomSource
 {
-    protected static $comics = array(
-        'pennyarcade' => 'Penny Arcade',
-    );
+    protected $domQuery = '.comic-panel img';
+    protected $feedUrl  = 'https://www.penny-arcade.com/feed';
 
-    protected $comicBase      = 'http://penny-arcade.com/comic';
-    protected $comicShortName = 'pennyarcade';
-    protected $domQuery       = '#comicFrame img';
-    protected $feedUrl        = 'http://penny-arcade.com/feed';
-
-    protected function validateFeedItem(SimpleXMLElement $item) : bool
+    public static function provides(): Comic
     {
-        return (bool) preg_match('#^Comic: #', (string) $item->title);
+        return Comic::createBaseComic(
+            'pennyarcade',
+            'Penny Arcade',
+            'http://penny-arcade.com/comic',
+        );
+    }
+
+    protected function validateFeedItem(SimpleXMLElement $item): bool
+    {
+        return (bool) preg_match('#Comic: #', (string) $item->description);
     }
 }
