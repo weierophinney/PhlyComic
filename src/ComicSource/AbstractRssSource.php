@@ -60,7 +60,7 @@ abstract class AbstractRssSource extends AbstractComicSource
             return (string) $item->{$this->tagWithImage};
         }
 
-        $namespacedChildren = $item->children($this->tagNamespace);
+        $namespacedChildren = $item->children($this->tagNamespace, true);
         return (string) $namespacedChildren->{$this->tagWithImage};
     }
 
@@ -120,7 +120,7 @@ abstract class AbstractRssSource extends AbstractComicSource
     protected function getImageFromContent(string $content): string|Comic
     {
         // image is in content -- /src="([^"]+)"
-        if (preg_match('/\<img [^>]*src="(?P<src>[^"]+)"/', $content, $matches)) {
+        if (preg_match('/\<img [^>]*src="(?P<src>[^"]+)"/u', $content, $matches)) {
             return $matches['src'];
         }
 
