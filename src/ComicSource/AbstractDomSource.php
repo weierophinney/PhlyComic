@@ -68,11 +68,6 @@ abstract class AbstractDomSource extends AbstractComicSource
         return false;
     }
 
-    protected function registerError($message)
-    {
-        return static::provides()->withError($message);
-    }
-
     protected function fetchComic(HttpClient $client, string $url) : Comic
     {
         $response = $client->sendRequest($client->createRequest('GET', $url));

@@ -4,7 +4,6 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 use PhlyComic\HttpClient;
-use Psr\Http\Client\ClientInterface;
 use Psr\Http\Message\ResponseInterface;
 use SimpleXMLElement;
 
@@ -101,7 +100,7 @@ abstract class AbstractRssSource extends AbstractComicSource
                 return $image;
             }
 
-            if ($image) {
+            if (! empty($image)) {
                 return static::provides()->withInstance($daily, $image);
             }
 
@@ -119,7 +118,7 @@ abstract class AbstractRssSource extends AbstractComicSource
         ));
     }
 
-    protected function getImageFromContent($content): string|Comic
+    protected function getImageFromContent(string $content): string|Comic
     {
         // image is in content -- /src="([^"]+)"
         if (preg_match('/\<img [^>]*src="(?P<src>[^"]+)"/', $content, $matches)) {
@@ -127,11 +126,6 @@ abstract class AbstractRssSource extends AbstractComicSource
         }
 
         return static::provides()->withError("Unable to find img tag: $content");
-    }
-
-    protected function registerError($message)
-    {
-        return static::provides()->withError($message);
     }
 
     protected function fetchFeed(HttpClient $client, string $url): ResponseInterface
@@ -142,7 +136,7 @@ abstract class AbstractRssSource extends AbstractComicSource
         return $client->sendRequest($request);
     }
 
-    protected function isOfInterest($item)
+    protected function isOfInterest(SimpleXMLElement|string $item): bool
     {
         return true;
     }
