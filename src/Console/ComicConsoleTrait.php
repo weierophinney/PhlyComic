@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 /**
  * @license   http://opensource.org/licenses/BSD-3-Clause BSD-3-Clause
  * @copyright Copyright (c) Matthew Weier O'Phinney
@@ -11,7 +14,6 @@ use Http\Discovery\Psr18ClientDiscovery;
 use PhlyComic\Comic;
 use PhlyComic\ComicFactory;
 use PhlyComic\HttpClient;
-use Psr\Http\Client\ClientInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 trait ComicConsoleTrait
