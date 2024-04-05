@@ -2,17 +2,19 @@
 
 namespace PhlyComic\ComicSource;
 
-class NotInventedHere extends AbstractDomSource
-{
-    protected static $comics = array(
-        'nih' => 'Not Invented Here',
-    );
+use PhlyComic\Comic;
 
-    protected $comicBase      = 'http://notinventedhe.re';
-    protected $comicShortName = 'nih';
-    protected $dailyFormat    = 'http://notinventedhe.re/on/%s';
-    protected $dateFormat     = 'Y-n-j';
-    protected $domQuery       = '#comic-content img';
-    protected $domIsHtml      = true;
-    protected $useComicBase   = true;
+class NotInventedHere extends AbstractAtomSource
+{
+    protected $feedUrl      = 'https://notinventedhe.re/feed';
+    protected $tagWithImage = 'content';
+
+    public static function provides(): Comic
+    {
+        return Comic::createBaseComic(
+            'nih',
+            'Not Invented Here',
+            'https://notinventedhe.re',
+        );
+    }
 }
