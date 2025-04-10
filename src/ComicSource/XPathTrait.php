@@ -17,6 +17,13 @@ trait XPathTrait
 {
     protected function getXPathForDocument(string $content): DOMXPath
     {
+        $document = $this->getDOMDocument($content);
+
+        return new DOMXPath($document);
+    }
+
+    protected function getDOMDocument(string $content): DOMDocument
+    {
         libxml_use_internal_errors(true);
 
         $document = new DOMDocument('1.0', 'UTF-8');
@@ -32,6 +39,6 @@ trait XPathTrait
             ));
         }
 
-        return new DOMXPath($document);
+        return $document;
     }
 }

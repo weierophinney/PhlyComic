@@ -7,25 +7,17 @@ namespace PhlyComic\ComicSource;
 use PhlyComic\Comic;
 use PhlyComic\HttpClient;
 
+use function date;
 use function sprintf;
-use function strpos;
+use function str_contains;
 
 abstract class GoComics extends AbstractDomSource
 {
     protected string $domQuery = 'picture.item-comic-image img';
-    private string $baseUrl    = 'https://www.gocomics.com';
 
     public function fetch(HttpClient $client): Comic
     {
-        $href = $this->fetchMostRecentComicPageHrefFromLandingPage($client);
-        if (null === $href) {
-            return $this->registerError(sprintf(
-                'Unable to find most recent comic for "%s"',
-                static::provides()->name,
-            ));
-        }
-
-        $response = $client->sendRequest($client->createRequest('GET', $href));
+        $response = $client->sendRequest($client->createRequest('GET', static::provides()->url));
         if ($response->getStatusCode() > 299) {
             return $this->registerError(sprintf(
                 'Unable to find most recent comic for "%s"',
@@ -34,13 +26,13 @@ abstract class GoComics extends AbstractDomSource
         }
 
         $html  = $response->getBody()->__toString();
-        $xpath = $this->getXPathForDocument($html);
+        $dom   = $this->getDOMDocument($html);
         $found = false;
 
-        foreach ($xpath->document->getElementsByTagName('picture') as $node) {
+        foreach ($dom->getElementsByTagName('img') as $node) {
             if (
                 $node->hasAttribute('class')
-                && false !== strpos($node->getAttribute('class'), 'item-comic-image')
+                && false !== str_contains($node->getAttribute('class'), 'Comic_comic__image_strip__')
             ) {
                 $found = $node;
                 break;
@@ -54,43 +46,20 @@ abstract class GoComics extends AbstractDomSource
             ));
         }
 
-        $image = false;
-        foreach ($found->childNodes as $node) {
-            if ($node->nodeName === 'img') {
-                $image = $node->getAttribute('src');
-                break;
-            }
-        }
+        $image = $node->getAttribute('src');
 
-        if (! $image) {
+        if ($image === '') {
             return $this->registerError(sprintf(
                 'Unable to find most recent comic for "%s"; img tag missing.',
                 static::provides()->name,
             ));
         }
 
-        return static::provides()->withInstance($href, $image);
+        return static::provides()->withInstance($this->generateLinkToCurrentStrip(), $image);
     }
 
-    private function fetchMostRecentComicPageHrefFromLandingPage(HttpClient $client): ?string
+    private function generateLinkToCurrentStrip(): string
     {
-        $response = $client->sendRequest($client->createRequest('GET', static::provides()->url));
-        if ($response->getStatusCode() > 299) {
-            return null;
-        }
-
-        $page  = $response->getBody()->__toString();
-        $xpath = $this->getXPathForDocument($page);
-        foreach ($xpath->document->getElementsByTagName('a') as $link) {
-            if (! $link->hasAttribute('data-link')) {
-                continue;
-            }
-            if ('comics' !== $link->getAttribute('data-link')) {
-                continue;
-            }
-            return sprintf('%s%s', $this->baseUrl, $link->getAttribute('href'));
-        }
-
-        return null;
+        return sprintf('%s/%s', static::provides()->url, date('Y/m/d'));
     }
 }
