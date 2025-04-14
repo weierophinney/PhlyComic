@@ -6,16 +6,13 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 use PhlyComic\HttpClient;
+use Symfony\Component\CssSelector\CssSelectorConverter;
 
 use function date;
 use function sprintf;
-use function str_contains;
 
 abstract class GoComics extends AbstractDomSource
 {
-    protected string $domQuery = 'picture.item-comic-image img';
-    protected string $imgClass = 'Comic_comic__image_strip__';
-
     public function fetch(HttpClient $client): Comic
     {
         $response = $client->sendRequest($client->createRequest('GET', static::provides()->url));
@@ -26,27 +23,18 @@ abstract class GoComics extends AbstractDomSource
             ));
         }
 
-        $html  = $response->getBody()->__toString();
-        $dom   = $this->getDOMDocument($html);
-        $found = false;
+        $html    = $response->getBody()->__toString();
+        $xpath   = $this->getXPathForDocument($html);
+        $results = $xpath->query((new CssSelectorConverter())->toXPath('div[data-sentry-component = Comic] img'));
 
-        foreach ($dom->getElementsByTagName('img') as $node) {
-            if (
-                $node->hasAttribute('class')
-                && false !== str_contains($node->getAttribute('class'), $this->imgClass)
-            ) {
-                $found = $node;
-                break;
-            }
-        }
-
-        if (! $found) {
+        if (false === $results || ! count($results)) {
             return $this->registerError(sprintf(
                 'Unable to find most recent comic for "%s"; page has unexpected structure.',
                 static::provides()->name,
             ));
         }
 
+        $node  = $results->item(0);
         $image = $node->getAttribute('src');
 
         if ($image === '') {
