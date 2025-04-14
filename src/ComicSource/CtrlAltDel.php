@@ -6,7 +6,7 @@ namespace PhlyComic\ComicSource;
 
 use DOMXPath;
 use PhlyComic\Comic;
-use PhpCss;
+use Symfony\Component\CssSelector\CssSelectorConverter;
 
 use function preg_match;
 use function strstr;
@@ -38,7 +38,7 @@ class CtrlAltDel extends AbstractDomSource
 
     protected function getDailyUrl(string $imgUrl, DOMXPath $xpath): string
     {
-        foreach ($xpath->query(PhpCss::toXpath($this->domQueryForLink)) as $node) {
+        foreach ($xpath->query((new CssSelectorConverter())->toXPath($this->domQueryForLink)) as $node) {
             if (! $node->hasAttribute('href')) {
                 continue;
             }

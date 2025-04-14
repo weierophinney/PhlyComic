@@ -8,8 +8,8 @@ use DOMDocument;
 use DOMXPath;
 use PhlyComic\Comic;
 use PhlyComic\HttpClient;
-use PhpCss;
 use SimpleXMLElement;
+use Symfony\Component\CssSelector\CssSelectorConverter;
 
 use function count;
 use function sprintf;
@@ -60,7 +60,7 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
         $document = new DOMDocument('1.0', 'UTF-8');
         $document->loadHTML($description);
         $xpath   = new DOMXPath($document);
-        $results = $xpath->query(PhpCss::toXpath($this->domQuery));
+        $results = $xpath->query((new CssSelectorConverter())->toXPath($this->domQuery));
 
         if (false === $results || ! count($results)) {
             return $this->registerError(sprintf(

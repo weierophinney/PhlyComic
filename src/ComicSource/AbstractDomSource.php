@@ -7,7 +7,7 @@ namespace PhlyComic\ComicSource;
 use DOMXPath;
 use PhlyComic\Comic;
 use PhlyComic\HttpClient;
-use PhpCss;
+use Symfony\Component\CssSelector\CssSelectorConverter;
 
 use function count;
 use function date;
@@ -74,7 +74,7 @@ abstract class AbstractDomSource extends AbstractComicSource
 
         $page    = $response->getBody()->__toString();
         $xpath   = $this->getXPathForDocument($page);
-        $results = $xpath->query(PhpCss::toXpath($this->domQuery));
+        $results = $xpath->query((new CssSelectorConverter())->toXPath($this->domQuery));
         if (false === $results || ! count($results)) {
             return $this->registerError(sprintf(
                 'Comic at "%s" has unparseable content',

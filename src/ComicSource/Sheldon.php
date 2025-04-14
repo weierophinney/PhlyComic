@@ -6,7 +6,7 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 use PhlyComic\HttpClient;
-use PhpCss;
+use Symfony\Component\CssSelector\CssSelectorConverter;
 
 use function count;
 use function file_get_contents;
@@ -52,7 +52,7 @@ class Sheldon extends AbstractComicSource
     private function getUrlFromPageNode(string $content, string $selector, string $attribute = 'href'): ?string
     {
         $xpath   = $this->getXPathForDocument($content);
-        $results = $xpath->query(PhpCss::toXpath($selector));
+        $results = $xpath->query((new CssSelectorConverter())->toXPath($selector));
         if (false === $results || 0 === count($results)) {
             return null;
         }

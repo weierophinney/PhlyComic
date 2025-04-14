@@ -7,7 +7,7 @@ namespace PhlyComic\ComicSource;
 use DOMXPath;
 use PhlyComic\Comic;
 use PhlyComic\HttpClient;
-use PhpCss;
+use Symfony\Component\CssSelector\CssSelectorConverter;
 
 use function preg_match;
 use function sprintf;
@@ -51,7 +51,7 @@ class CommitStrip extends AbstractDomSource
         $html  = $response->getBody()->__toString();
         $xpath = $this->getXPathForDocument($html);
         $found = false;
-        foreach ($xpath->query(PhpCss::toXpath('.entry-content img')) as $node) {
+        foreach ($xpath->query((new CssSelectorConverter())->toXPath('.entry-content img')) as $node) {
             $found = $node;
             break;
         }
@@ -85,7 +85,7 @@ class CommitStrip extends AbstractDomSource
 
     protected function getDailyUrl(string $imgUrl, DOMXPath $xpath): string
     {
-        foreach ($xpath->query(PhpCss::toXpath($this->domQueryForLink)) as $node) {
+        foreach ($xpath->query((new CssSelectorConverter())->toXPath($this->domQueryForLink)) as $node) {
             if (! $node->hasAttribute('href')) {
                 continue;
             }
@@ -110,7 +110,7 @@ class CommitStrip extends AbstractDomSource
 
         $page  = $response->getBody()->__toString();
         $xpath = $this->getXPathForDocument($page);
-        foreach ($xpath->query(PhpCss::toXpath($this->domQueryForLink)) as $node) {
+        foreach ($xpath->query((new CssSelectorConverter())->toXPath($this->domQueryForLink)) as $node) {
             if (! $node->hasAttribute('href')) {
                 continue;
             }
