@@ -14,6 +14,7 @@ use function str_contains;
 abstract class GoComics extends AbstractDomSource
 {
     protected string $domQuery = 'picture.item-comic-image img';
+    protected string $imgClass = 'Comic_comic__image_strip__';
 
     public function fetch(HttpClient $client): Comic
     {
@@ -32,7 +33,7 @@ abstract class GoComics extends AbstractDomSource
         foreach ($dom->getElementsByTagName('img') as $node) {
             if (
                 $node->hasAttribute('class')
-                && false !== str_contains($node->getAttribute('class'), 'Comic_comic__image_strip__')
+                && false !== str_contains($node->getAttribute('class'), $this->imgClass)
             ) {
                 $found = $node;
                 break;
