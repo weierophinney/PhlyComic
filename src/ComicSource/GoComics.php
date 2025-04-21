@@ -25,7 +25,7 @@ abstract class GoComics extends AbstractDomSource
 
         $html    = $response->getBody()->__toString();
         $xpath   = $this->getXPathForDocument($html);
-        $results = $xpath->query((new CssSelectorConverter())->toXPath('div[data-sentry-component = Comic] img'));
+        $results = $xpath->query((new CssSelectorConverter())->toXPath('div[class*=ComicViewer_comicViewer__comic] img'));
 
         if (false === $results || ! count($results)) {
             return $this->registerError(sprintf(
