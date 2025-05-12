@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace PhlyComic\ComicSource;
 
+use DateTimeImmutable;
 use DOMNodeList;
 use JsonException;
 use PhlyComic\Comic;
@@ -62,6 +63,8 @@ abstract class GoComics extends AbstractDomSource
 
     private function parseScriptsForImage(DOMNodeList $scripts): string
     {
+        $nameIncludes = sprintf('%s - %s', static::provides()->title, (new DateTimeImmutable())->format('F j, Y'));
+
         foreach ($scripts as $script) {
             $json = $script->textContent;
             try {
@@ -83,6 +86,14 @@ abstract class GoComics extends AbstractDomSource
                 ! array_key_exists('url', $document)
                 || ! is_string($document['url'])
                 || str_contains($document['url'], 'Feature_Splash_')
+            ) {
+                continue;
+            }
+
+            if (
+                ! array_key_exists('name', $document)
+                || ! is_string($document['name'])
+                || ! str_contains($document['name'], $nameIncludes)
             ) {
                 continue;
             }
