@@ -13,6 +13,12 @@ use function sprintf;
 
 abstract class GoComics extends AbstractDomSource
 {
+    /** Potential CSS queries that can match the image */
+    private const QUERY_SELECTORS = [
+        'div[class*=ComicViewer_comicViewer__comic] img',
+        'img[class*=Comic_comic__image_isStrip__]',
+    ];
+
     public function fetch(HttpClient $client): Comic
     {
         $response = $client->sendRequest($client->createRequest('GET', static::provides()->url));
@@ -25,7 +31,13 @@ abstract class GoComics extends AbstractDomSource
 
         $html    = $response->getBody()->__toString();
         $xpath   = $this->getXPathForDocument($html);
-        $results = $xpath->query((new CssSelectorConverter())->toXPath('div[class*=ComicViewer_comicViewer__comic] img'));
+
+        foreach (self::QUERY_SELECTORS as $query) {
+            $results = $xpath->query((new CssSelectorConverter())->toXPath($query));
+            if (false !== $results && 0 < count($results)) {
+                break;
+            }
+        }
 
         if (false === $results || ! count($results)) {
             return $this->registerError(sprintf(
