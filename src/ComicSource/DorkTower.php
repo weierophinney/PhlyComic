@@ -43,6 +43,10 @@ class DorkTower extends AbstractRssSource
             return self::provides()->withError("Could not find image tag with supported image type (found $image)");
         }
 
+        if (! preg_match('#^https?://i', $image)) {
+            $image = 'https://www.dorktower.com/' . $image;
+        }
+
         return $image;
     }
 }
