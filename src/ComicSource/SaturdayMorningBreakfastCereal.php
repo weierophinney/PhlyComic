@@ -14,6 +14,9 @@ use Symfony\Component\CssSelector\CssSelectorConverter;
 use function count;
 use function sprintf;
 
+use const LIBXML_NOERROR;
+use const LIBXML_RECOVER;
+
 /**
  * The SMBC feed provides a link to the **page** containing the comic,
  * but the link to the comic image is buried inside the description.
@@ -57,8 +60,13 @@ class SaturdayMorningBreakfastCereal extends AbstractRssSource
 
     protected function getImageFromDescription(string $description, string $url): string|Comic
     {
+        $errorMask = LIBXML_NOERROR;
+        if (PHP_VERSION_ID >= 80400) {
+            $errorMask |= LIBXML_RECOVER;
+        }
+
         $document = new DOMDocument('1.0', 'UTF-8');
-        $document->loadHTML($description);
+        $document->loadHTML($description, $errorMask);
         $xpath   = new DOMXPath($document);
         $results = $xpath->query((new CssSelectorConverter())->toXPath($this->domQuery));
 
