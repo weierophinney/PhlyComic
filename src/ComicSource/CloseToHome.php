@@ -6,8 +6,10 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 
-class CloseToHome extends GoComics
+class CloseToHome extends AbstractRssSource
 {
+    protected string $feedUrl = 'https://comiccaster.xyz/rss/closetohome';
+
     public static function provides(): Comic
     {
         return Comic::createBaseComic(

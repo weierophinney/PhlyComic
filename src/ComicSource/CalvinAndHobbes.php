@@ -6,8 +6,10 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 
-class CalvinAndHobbes extends GoComics
+class CalvinAndHobbes extends AbstractRssSource
 {
+    protected string $feedUrl = 'https://comiccaster.xyz/rss/calvinandhobbes';
+
     public static function provides(): Comic
     {
         return Comic::createBaseComic(

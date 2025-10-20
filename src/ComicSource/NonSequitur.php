@@ -6,8 +6,10 @@ namespace PhlyComic\ComicSource;
 
 use PhlyComic\Comic;
 
-class NonSequitur extends GoComics
+class NonSequitur extends AbstractRssSource
 {
+    protected string $feedUrl = 'https://comiccaster.xyz/rss/nonsequitur';
+
     public static function provides(): Comic
     {
         return Comic::createBaseComic(
