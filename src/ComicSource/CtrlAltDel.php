@@ -15,8 +15,8 @@ class CtrlAltDel extends AbstractDomSource
 {
     protected string $dailyFormat     = 'http://cad-comic.com/';
     protected bool $domIsHtml         = true;
-    protected string $domQuery        = '.comicpage a img';
-    protected string $domQueryForLink = '.comicpage a';
+    protected string $domQuery        = 'img.comic-display';
+    protected string $domQueryForLink = 'a.comic-image-link';
     protected bool $useComicBase      = true;
 
     public static function provides(): Comic
@@ -24,13 +24,13 @@ class CtrlAltDel extends AbstractDomSource
         return Comic::createBaseComic(
             'ctrlaltdel',
             'Ctrl+Alt+Del',
-            'http://www.cad-comic.com/',
+            'http://cad-comic.com/',
         );
     }
 
     protected function validateImageSrc(string $src): bool
     {
-        if (strstr($src, '//cad-comic.com/wp-content/uploads/')) {
+        if (strstr($src, '//cad-comic.com/comic-image/')) {
             return true;
         }
         return false;
