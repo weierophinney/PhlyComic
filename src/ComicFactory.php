@@ -13,6 +13,7 @@ use PhlyComic\ComicSource\CtrlAltDel;
 use PhlyComic\ComicSource\CulDeSac;
 use PhlyComic\ComicSource\DorkTower;
 use PhlyComic\ComicSource\Drive;
+use PhlyComic\ComicSource\FarSide;
 use PhlyComic\ComicSource\FMinus;
 use PhlyComic\ComicSource\ForBetterOrForWorse;
 use PhlyComic\ComicSource\FoxTrot;
@@ -91,6 +92,7 @@ final class ComicFactory implements ContainerInterface
         DorkTower::class,
         Drive::class,
         FMinus::class,
+        FarSide::class,
         ForBetterOrForWorse::class,
         FoxTrot::class,
         GarfieldMinusGarfield::class,
